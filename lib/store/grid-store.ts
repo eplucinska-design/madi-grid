@@ -64,6 +64,7 @@ export interface GridComment {
   authorName: string
   content: string
   createdAt: string
+  updatedAt?: string
   pinned?: boolean
 }
 
@@ -513,6 +514,8 @@ interface GridState {
   updateChecklistItem: (taskId: string, itemId: string, patch: Partial<GridChecklistItem>) => void
   deleteChecklistItem: (taskId: string, itemId: string) => void
   addComment: (taskId: string, authorId: string, authorName: string, content: string) => void
+  updateComment: (taskId: string, commentId: string, content: string) => void
+  deleteComment: (taskId: string, commentId: string) => void
   togglePinnedComment: (taskId: string, commentId: string) => void
   addRcpEvent: (
     taskId: string,
@@ -929,6 +932,39 @@ export const useGridStore = create<GridState>()(
           })
         }
       },
+
+      updateComment: (taskId, commentId, content) => {
+        const trimmed = content.trim()
+        if (!trimmed) return
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  comments: task.comments.map((comment) =>
+                    comment.id === commentId
+                      ? { ...comment, content: trimmed, updatedAt: new Date().toISOString() }
+                      : comment
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        }))
+      },
+
+      deleteComment: (taskId, commentId) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  comments: task.comments.filter((comment) => comment.id !== commentId),
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
 
       togglePinnedComment: (taskId, commentId) =>
         set((state) => ({

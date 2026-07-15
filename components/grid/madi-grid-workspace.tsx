@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type DragEvent, type MouseEvent as ReactM
 import { createPortal } from 'react-dom'
 import {
   AlertTriangle,
+  Archive,
   ArrowDown,
   ArrowUp,
   Brush,
@@ -26,6 +27,7 @@ import {
   MessageSquare,
   Package,
   PanelRight,
+  Pencil,
   Pin,
   PinOff,
   Plus,
@@ -2155,6 +2157,8 @@ function TaskDetailPanel() {
     updateChecklistItem,
     deleteChecklistItem,
     addComment,
+    updateComment,
+    deleteComment,
     togglePinnedComment,
   } = useGridStore()
   const { user } = useAuthStore()
@@ -2165,6 +2169,8 @@ function TaskDetailPanel() {
   const [correctionDescription, setCorrectionDescription] = useState('')
   const [correctionDueDate, setCorrectionDueDate] = useState(() => new Date().toISOString().slice(0, 10))
   const [correctionEstimate, setCorrectionEstimate] = useState(30)
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
+  const [editingCommentContent, setEditingCommentContent] = useState('')
 
   if (!task) {
     return (
@@ -2183,6 +2189,20 @@ function TaskDetailPanel() {
   const timeMode = getTaskTimeMode(task)
   const pinnedComment = getPinnedComment(task)
   const latestCorrection = getLatestCorrection(task)
+  const startCommentEdit = (commentId: string, content: string) => {
+    setEditingCommentId(commentId)
+    setEditingCommentContent(content)
+  }
+  const cancelCommentEdit = () => {
+    setEditingCommentId(null)
+    setEditingCommentContent('')
+  }
+  const saveCommentEdit = () => {
+    if (!editingCommentId) return
+    updateComment(task.id, editingCommentId, editingCommentContent)
+    cancelCommentEdit()
+  }
+  const setQuickStatus = (status: GridStatusId) => updateTask(task.id, { status })
 
   return (
     <aside className="w-[var(--app-detail-panel-width)] shrink-0 border-l border-border bg-background">
@@ -2214,6 +2234,40 @@ function TaskDetailPanel() {
             onChange={(event) => updateTask(task.id, { title: event.target.value })}
             className="mb-3 w-full rounded-md border border-transparent bg-transparent px-1 py-1 text-[clamp(17px,1vw,20px)] font-semibold outline-none hover:border-border focus:border-primary focus:bg-muted/20"
           />
+          <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+            <button
+              onClick={() => setQuickStatus('in_progress')}
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2 font-semibold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-500/45 dark:bg-emerald-950/35 dark:text-emerald-200"
+              title="Oznacz zlecenie jako w toku"
+            >
+              <Clock3 size={14} />
+              W toku
+            </button>
+            <button
+              onClick={() => setQuickStatus('done')}
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-green-300 bg-green-50 px-2 font-semibold text-green-700 hover:bg-green-100 dark:border-green-500/45 dark:bg-green-950/35 dark:text-green-200"
+              title="Oznacz zlecenie jako gotowe"
+            >
+              <Check size={14} />
+              Gotowe
+            </button>
+            <button
+              onClick={() => setQuickStatus('review')}
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-orange-300 bg-orange-50 px-2 font-semibold text-orange-700 hover:bg-orange-100 dark:border-orange-500/45 dark:bg-orange-950/35 dark:text-orange-200"
+              title="Przekaz zlecenie do poprawki / sprawdzenia"
+            >
+              <AlertTriangle size={14} />
+              Poprawka
+            </button>
+            <button
+              onClick={() => setQuickStatus('done')}
+              className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-muted/30 px-2 font-semibold text-muted-foreground hover:bg-muted hover:text-foreground"
+              title="Archiwizuj jako gotowe"
+            >
+              <Archive size={14} />
+              Archiwizuj
+            </button>
+          </div>
           {pinnedComment && (
             <div className="madi-pinned-note mb-3 rounded-md border border-amber-300/80 bg-amber-50 p-3 text-amber-950 dark:border-amber-400/45 dark:bg-amber-950/35 dark:text-amber-100">
               <div className="mb-1 flex items-center justify-between gap-2">
@@ -2543,9 +2597,58 @@ function TaskDetailPanel() {
                       >
                         {comment.pinned ? <PinOff size={13} /> : <Pin size={13} />}
                       </button>
+                      <button
+                        onClick={() => startCommentEdit(comment.id, comment.content)}
+                        className="flex h-7 w-7 items-center justify-center rounded hover:bg-muted hover:text-primary"
+                        title="Edytuj komentarz"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteComment(task.id, comment.id)
+                          if (editingCommentId === comment.id) cancelCommentEdit()
+                        }}
+                        className="flex h-7 w-7 items-center justify-center rounded hover:bg-destructive/10 hover:text-destructive"
+                        title="Usun komentarz"
+                      >
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   </div>
-                  <p className="text-sm">{comment.content}</p>
+                  {editingCommentId === comment.id ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={editingCommentContent}
+                        onChange={(event) => setEditingCommentContent(event.target.value)}
+                        rows={3}
+                        className="w-full resize-none rounded-md border border-border bg-background p-2 text-sm outline-none focus:border-primary"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={saveCommentEdit}
+                          className="h-8 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                        >
+                          Zapisz
+                        </button>
+                        <button
+                          onClick={cancelCommentEdit}
+                          className="h-8 rounded-md border border-border px-3 text-xs font-semibold hover:bg-muted"
+                        >
+                          Anuluj
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm">{comment.content}</p>
+                      {comment.updatedAt && (
+                        <p className="mt-1 text-[10px] text-muted-foreground">
+                          Edytowano {new Date(comment.updatedAt).toLocaleString('pl-PL')}
+                        </p>
+                      )}
+                    </>
+                  )}
                 </div>
               ))}
               <textarea
