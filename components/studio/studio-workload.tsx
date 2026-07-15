@@ -1099,14 +1099,14 @@ function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: Stu
   const expandedIndex = expandedDate ? days.findIndex((day) => toIso(day) === expandedDate) : -1
   const expandedRow = expandedIndex >= 0 ? Math.floor(expandedIndex / 7) : -1
   const expandedTaskCount = expandedDate ? (tasksByDate.get(expandedDate)?.length ?? 0) : 0
-  const expandedRowHeight = Math.max(260, 154 + Math.max(0, expandedTaskCount - 1) * 64)
+  const expandedRowHeight = Math.max(340, 120 + expandedTaskCount * 76)
   const calendarRows = mode === 'day' ? 1 : Math.ceil(days.length / 7)
   const gridRows = mode === 'day'
     ? 'minmax(520px, 1fr)'
     : mode === 'week'
       ? 'minmax(420px, 1fr)'
       : Array.from({ length: calendarRows }, (_, row) =>
-          row === expandedRow ? `minmax(${expandedRowHeight}px, max-content)` : 'minmax(154px, 1fr)'
+          row === expandedRow ? `minmax(${expandedRowHeight}px, max-content)` : 'minmax(176px, 1fr)'
         ).join(' ')
 
   const navigate = (direction: -1 | 1) => {
@@ -1177,7 +1177,7 @@ function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: Stu
         </div>
       )}
 
-      <div className={`grid madi-scroll-area flex-1 ${mode === 'day' ? 'grid-cols-1' : 'grid-cols-7'}`} style={{ gridTemplateRows: gridRows }}>
+      <div className={`grid madi-scroll-area min-h-0 flex-1 overflow-auto ${mode === 'day' ? 'grid-cols-1' : 'grid-cols-7'}`} style={{ gridTemplateRows: gridRows }}>
         {days.map((day) => {
           const iso = toIso(day)
           const dayTasks = tasksByDate.get(iso) ?? []
@@ -1220,7 +1220,7 @@ function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: Stu
                     draggable
                     onClick={() => onSelect(task.id)}
                     onDoubleClick={() => openStudioTask(task)}
-                    className={`group w-full rounded-md border px-2 py-1.5 text-left shadow-sm transition-colors hover:border-primary/60 hover:bg-muted/30 ${
+                    className={`group w-full shrink-0 rounded-md border px-2 py-1.5 text-left shadow-sm transition-colors hover:border-primary/60 hover:bg-muted/30 ${
                       selectedId === task.id ? 'border-primary bg-primary/5' : 'border-border bg-card'
                     }`}
                   >

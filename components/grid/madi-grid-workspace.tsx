@@ -1425,12 +1425,12 @@ function PlanningCalendarView({ tasks }: { tasks: GridTask[] }) {
   const expandedIndex = expandedDate ? days.findIndex((day) => toCalendarIsoDate(day) === expandedDate) : -1
   const expandedRow = expandedIndex >= 0 ? Math.floor(expandedIndex / 7) : -1
   const expandedTaskCount = expandedDate ? (tasksByDate.get(expandedDate)?.length ?? 0) : 0
-  const expandedRowHeight = Math.max(260, 154 + Math.max(0, expandedTaskCount - 1) * 64)
+  const expandedRowHeight = Math.max(340, 120 + expandedTaskCount * 76)
   const calendarRowCount = Math.ceil(days.length / 7)
   const calendarGridRows = mode === 'week'
     ? 'minmax(360px, 1fr)'
     : Array.from({ length: calendarRowCount }, (_, row) =>
-        row === expandedRow ? `minmax(${expandedRowHeight}px, max-content)` : 'minmax(154px, 1fr)'
+        row === expandedRow ? `minmax(${expandedRowHeight}px, max-content)` : 'minmax(176px, 1fr)'
       ).join(' ')
 
   const moveTaskToDate = (event: DragEvent<HTMLDivElement>, date: string) => {
@@ -1546,7 +1546,7 @@ function PlanningCalendarView({ tasks }: { tasks: GridTask[] }) {
 
 
       <div
-        className="grid madi-scroll-area flex-1 grid-cols-7"
+        className="grid madi-scroll-area min-h-0 flex-1 grid-cols-7 overflow-auto"
         style={{ gridTemplateRows: calendarGridRows }}
       >
         {days.map((day) => {
@@ -1612,7 +1612,7 @@ function PlanningCalendarView({ tasks }: { tasks: GridTask[] }) {
                         event.dataTransfer.effectAllowed = 'move'
                       }}
                       onClick={() => setActiveTask(task.id)}
-                      className="group w-full rounded-md border border-border bg-card px-2 py-1.5 text-left shadow-sm transition-colors hover:border-primary/60 hover:bg-muted/30"
+                      className="group w-full shrink-0 rounded-md border border-border bg-card px-2 py-1.5 text-left shadow-sm transition-colors hover:border-primary/60 hover:bg-muted/30"
                     >
                       <div className="flex min-w-0 items-center gap-1.5">
                         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: status?.color ?? priorityColors[task.priority] }} />
