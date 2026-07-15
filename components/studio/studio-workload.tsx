@@ -1256,7 +1256,22 @@ function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: Stu
   )
 }
 
-function StudioAside({ task, onOpen, onDone, onRework }: { task: StudioTask; onOpen: () => void; onDone: () => void; onRework: () => void }) {
+function StudioAside({
+  task,
+  onOpen,
+  onDone,
+  onRework,
+}: {
+  task: StudioTask
+  onOpen: () => void
+  onDone: () => void
+  onRework: (input: { reason: string; description: string; date: string; time: string; minutes: number }) => void
+}) {
+  const [correctionReason, setCorrectionReason] = useState('Blad przygotowania plikow')
+  const [correctionDescription, setCorrectionDescription] = useState('')
+  const [correctionDate, setCorrectionDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [correctionMinutes, setCorrectionMinutes] = useState(30)
+
   return (
     <aside className="flex min-h-0 flex-col bg-background">
       <header className="shrink-0 border-b border-border p-4">
@@ -1326,14 +1341,75 @@ function StudioAside({ task, onOpen, onDone, onRework }: { task: StudioTask; onO
           </div>
         </section>
 
-        <section className="mt-3 rounded-md border border-border bg-card p-3">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Komentarze</p>
-            <button className="flex h-7 items-center gap-1 rounded-md border border-border px-2 text-xs font-semibold hover:bg-muted">
-              <Plus size={13} /> Dodaj
-            </button>
+        <section className="mt-3 rounded-md border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <MessageSquare size={14} />
+              Komentarze
+            </p>
+            <ChevronDown size={14} className="text-muted-foreground" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3 p-3">
+            <div className="rounded-md border border-red-300/80 bg-red-50 p-3 text-red-950 dark:border-red-400/45 dark:bg-red-950/35 dark:text-red-100">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <AlertTriangle size={15} />
+                Poprawka / uwaga do zlecenia
+              </div>
+              <select
+                value={correctionReason}
+                onChange={(event) => setCorrectionReason(event.target.value)}
+                className="mb-2 h-9 w-full rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+              >
+                <option>Blad przygotowania plikow</option>
+                <option>Blad obslugi zlecenia</option>
+                <option>Blad produkcyjny / technologiczny</option>
+                <option>Blad po stronie klienta</option>
+                <option>Zmiana zakresu / dodatkowe uwagi</option>
+              </select>
+              <textarea
+                value={correctionDescription}
+                onChange={(event) => setCorrectionDescription(event.target.value)}
+                placeholder="Opisz dokladnie co poprawic, co wyjasnic albo co blokuje dalszy etap..."
+                rows={3}
+                className="mb-2 w-full resize-none rounded-md border border-red-200 bg-background p-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-red-400 dark:border-red-800"
+              />
+              <div className="mb-2 grid grid-cols-[minmax(0,1fr)_96px] gap-2">
+                <input
+                  type="date"
+                  value={correctionDate}
+                  onChange={(event) => setCorrectionDate(event.target.value)}
+                  className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  value={correctionMinutes}
+                  onChange={(event) => setCorrectionMinutes(Number.parseInt(event.target.value, 10) || 0)}
+                  className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+                  title="Szacowany czas poprawki w minutach"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const text = correctionDescription.trim()
+                  if (!text) return
+                  const fallbackTime = task.deadline.includes(' ') ? task.deadline.split(' ').at(-1) ?? '12:00' : '12:00'
+                  onRework({
+                    reason: correctionReason,
+                    description: text,
+                    date: correctionDate,
+                    time: fallbackTime,
+                    minutes: correctionMinutes,
+                  })
+                  setCorrectionDescription('')
+                }}
+                className="flex h-9 w-full items-center justify-center gap-1.5 rounded-md bg-red-600 px-3 text-xs font-semibold text-white hover:bg-red-700"
+              >
+                <AlertTriangle size={14} />
+                Zglos poprawke
+              </button>
+            </div>
             {task.comments.map((comment) => (
               <div key={comment.id} className="rounded-md border border-border bg-background p-2">
                 <div className="mb-1 flex items-center gap-2">
@@ -1355,10 +1431,16 @@ function StudioAside({ task, onOpen, onDone, onRework }: { task: StudioTask; onO
           <button onClick={onDone} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
             <CheckCircle2 size={14} /> Gotowe
           </button>
-          <button className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
+          <button
+            onClick={() => setCorrectionDescription((value) => value || task.note)}
+            className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted"
+          >
             <MessageSquare size={14} /> Komentarz
           </button>
-          <button onClick={onRework} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
+          <button
+            onClick={() => setCorrectionDescription((value) => value || task.note)}
+            className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted"
+          >
             <AlertTriangle size={14} /> Poprawka
           </button>
           <button onClick={onOpen} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
@@ -1370,14 +1452,19 @@ function StudioAside({ task, onOpen, onDone, onRework }: { task: StudioTask; onO
   )
 }
 
-function StudioActivityAside({ tasks, selectedTask, onSelect, onOpen, onDone }: {
+function StudioActivityAside({ tasks, selectedTask, onSelect, onOpen, onDone, onRework }: {
   tasks: StudioTask[]
   selectedTask: StudioTask
   onSelect: (id: string) => void
   onOpen: () => void
   onDone: () => void
+  onRework: (input: { reason: string; description: string; date: string; time: string; minutes: number }) => void
 }) {
   const [channel, setChannel] = useState<'activity' | 'updates' | 'alerts' | 'comments' | 'assignments'>('activity')
+  const [correctionReason, setCorrectionReason] = useState('Blad przygotowania plikow')
+  const [correctionDescription, setCorrectionDescription] = useState('')
+  const [correctionDate, setCorrectionDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [correctionMinutes, setCorrectionMinutes] = useState(30)
   const activityItems = tasks.slice(0, 9).map((task, index) => ({
     id: `${task.id}-activity`,
     task,
@@ -1515,6 +1602,90 @@ function StudioActivityAside({ tasks, selectedTask, onSelect, onOpen, onDone }: 
             {selectedTask.note}
           </div>
         </section>
+
+        <section className="mt-3 rounded-md border border-border bg-card">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between gap-2 border-b border-border px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+          >
+            <span className="flex items-center gap-2">
+              <MessageSquare size={14} />
+              Komentarze
+            </span>
+            <ChevronDown size={14} />
+          </button>
+          <div className="space-y-3 p-3">
+            <div className="rounded-md border border-red-300/80 bg-red-50 p-3 text-red-950 dark:border-red-400/45 dark:bg-red-950/35 dark:text-red-100">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <AlertTriangle size={15} />
+                Poprawka / uwaga do zlecenia
+              </div>
+              <select
+                value={correctionReason}
+                onChange={(event) => setCorrectionReason(event.target.value)}
+                className="mb-2 h-9 w-full rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+              >
+                <option>Blad przygotowania plikow</option>
+                <option>Blad obslugi zlecenia</option>
+                <option>Blad produkcyjny / technologiczny</option>
+                <option>Blad po stronie klienta</option>
+                <option>Zmiana zakresu / dodatkowe uwagi</option>
+              </select>
+              <textarea
+                value={correctionDescription}
+                onChange={(event) => setCorrectionDescription(event.target.value)}
+                placeholder="Opisz dokladnie co poprawic, co wyjasnic albo co blokuje dalszy etap..."
+                rows={3}
+                className="mb-2 w-full resize-none rounded-md border border-red-200 bg-background p-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-red-400 dark:border-red-800"
+              />
+              <div className="mb-2 grid grid-cols-[minmax(0,1fr)_96px] gap-2">
+                <input
+                  type="date"
+                  value={correctionDate}
+                  onChange={(event) => setCorrectionDate(event.target.value)}
+                  className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  value={correctionMinutes}
+                  onChange={(event) => setCorrectionMinutes(Number.parseInt(event.target.value, 10) || 0)}
+                  className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs text-foreground outline-none focus:border-red-400 dark:border-red-800"
+                  title="Szacowany czas poprawki w minutach"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const text = correctionDescription.trim()
+                  if (!text) return
+                  const fallbackTime = selectedTask.deadline.includes(' ') ? selectedTask.deadline.split(' ').at(-1) ?? '12:00' : '12:00'
+                  onRework({
+                    reason: correctionReason,
+                    description: text,
+                    date: correctionDate,
+                    time: fallbackTime,
+                    minutes: correctionMinutes,
+                  })
+                  setCorrectionDescription('')
+                }}
+                className="flex h-9 w-full items-center justify-center gap-1.5 rounded-md bg-red-600 px-3 text-xs font-semibold text-white hover:bg-red-700"
+              >
+                <AlertTriangle size={14} />
+                Zglos poprawke
+              </button>
+            </div>
+            {selectedTask.comments.map((comment) => (
+              <article key={comment.id} className="rounded-md border border-border bg-background p-3 text-xs">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="font-semibold">{comment.author}</span>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">{comment.createdAt}</span>
+                </div>
+                <p className="leading-relaxed text-muted-foreground">{comment.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
 
       <footer className="shrink-0 border-t border-border p-3">
@@ -1525,8 +1696,8 @@ function StudioActivityAside({ tasks, selectedTask, onSelect, onOpen, onDone }: 
           <button onClick={onDone} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
             <CheckCircle2 size={14} /> Gotowe
           </button>
-          <button className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
-            <MessageSquare size={14} /> Komentarz
+          <button onClick={() => setChannel('comments')} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
+            <MessageSquare size={14} /> Komentarze
           </button>
           <button onClick={onOpen} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
             <ExternalLink size={14} /> Okno
@@ -1713,7 +1884,7 @@ export function StudioWorkload({
           task={selectedTask}
           onOpen={openSelected}
           onDone={() => markDone(selectedTask.id)}
-          onRework={() => setCorrectionTask(selectedTask)}
+          onRework={(input) => saveGraphicCorrection(selectedTask, input)}
         />
       ) : undefined}
     >
