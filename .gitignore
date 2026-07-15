@@ -16,3 +16,4 @@ node_modules
 *.log
 *.tsbuildinfo
 .video-frames/
+exports/
