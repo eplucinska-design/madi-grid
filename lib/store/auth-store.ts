@@ -8,6 +8,17 @@ const REMEMBER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 // Demo users for testing with 4-digit PINs. The login is stored in the email field for now.
 export const DEMO_USERS: (User & { pin: string })[] = [
   {
+    id: 'admin-test',
+    email: 'admin',
+    name: 'Admin',
+    initials: 'AD',
+    role: 'administrator',
+    department: 'Konto testowe - wpisy testowe',
+    avatarColor: '#e03131',
+    permissions: ['all'],
+    pin: '',
+  },
+  {
     id: '1',
     email: 'emilia.plucinska',
     name: 'Emilia Plucińska',
@@ -236,7 +247,7 @@ export const useAuthStore = create<AuthState>()(
         const login = email.trim().toLowerCase()
         const user = DEMO_USERS.find((item) => item.email.toLowerCase() === login)
 
-        if (user && user.pin === password) {
+        if (user && (user.pin === password || (user.id === 'admin-test' && password.trim() === ''))) {
           set(createSession(user, rememberMe))
           return true
         }
@@ -255,7 +266,7 @@ export const useAuthStore = create<AuthState>()(
 
         const user = DEMO_USERS.find((item) => item.id === userId)
 
-        if (user && user.pin === pin) {
+        if (user && (user.pin === pin || (user.id === 'admin-test' && pin.trim() === ''))) {
           set(createSession(user))
           return true
         }

@@ -71,6 +71,10 @@ export function LoginScreen() {
   }, [selectedUser, loginMode, handlePinInput, handleBackspace, clearError])
 
   const handleUserSelect = (user: typeof DEMO_USERS[0]) => {
+    if (user.id === 'admin-test') {
+      loginWithPin(user.id, '')
+      return
+    }
     setSelectedUser(user)
     setUsersExpanded(false)
     setPin('')
@@ -149,7 +153,7 @@ export function LoginScreen() {
                 // User selection
                 <>
                   <h1 className="text-2xl font-bold tracking-tight mb-2">Wybierz swoje konto</h1>
-                  <p className="text-white/50 text-sm mb-6">Kliknij swój profil i wpisz przypisany PIN.</p>
+                  <p className="text-white/50 text-sm mb-6">Kliknij swój profil i wpisz przypisany PIN. Admin loguje się bez PIN-u.</p>
                   
                   <div className="rounded-2xl border border-white/[0.06] bg-white/[0.015]">
                     <div className={`grid grid-cols-2 gap-3 p-2 pr-1.5 ${usersExpanded ? 'max-h-[360px] overflow-y-auto' : ''}`}>
@@ -291,7 +295,7 @@ export function LoginScreen() {
               // Email Login Mode
               <>
                 <h1 className="text-2xl font-bold tracking-tight mb-2">Zaloguj się</h1>
-                <p className="text-white/50 text-sm mb-6">Wprowadź email oraz PIN przypisany do profilu.</p>
+                <p className="text-white/50 text-sm mb-6">Wprowadź email oraz PIN przypisany do profilu. Login admin działa bez PIN-u.</p>
 
                 <form onSubmit={handleEmailLogin} className="space-y-4">
                   {/* Email field */}
@@ -323,9 +327,9 @@ export function LoginScreen() {
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="4-cyfrowy PIN"
+                        placeholder={email.trim().toLowerCase() === 'admin' ? 'Admin bez PIN-u' : '4-cyfrowy PIN'}
                         className="w-full h-12 pl-12 pr-12 rounded-xl border border-white/[0.1] bg-white/[0.04] text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
-                        required
+                        required={email.trim().toLowerCase() !== 'admin'}
                       />
                       <button
                         type="button"
