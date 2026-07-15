@@ -35,26 +35,24 @@ const bottomLabels: Record<(typeof bottomItems)[number]['id'], string> = {
   settings: 'Ustawienia',
 }
 
-const externalItems: { id: 'slack' | 'mail'; label: string; fallbackHref: string; icon: React.ReactNode }[] = [
-  { id: 'slack', label: 'Slack', fallbackHref: 'slack://open', icon: <Slack size={18} /> },
-  { id: 'mail', label: 'Thunderbird / Mail', fallbackHref: 'mailto:', icon: <Mail size={18} /> },
+const externalItems: { id: 'slack' | 'mail'; label: string; href: string; target?: string; icon: React.ReactNode }[] = [
+  { id: 'slack', label: 'Slack', href: 'slack://open', icon: <Slack size={18} /> },
+  { id: 'mail', label: 'Poczta', href: 'https://mail.google.com/mail/u/0/#inbox', target: '_blank', icon: <Mail size={18} /> },
 ]
 
 export function IconSidebar() {
   const { currentModule, setCurrentModule } = useAppStore()
   const { notifications, panelOpen, togglePanel } = useNotificationsStore()
   const unreadCount = notifications.filter((item) => !item.readAt).length
-  const launchExternalApp = async (item: (typeof externalItems)[number]) => {
-    try {
-      const response = await fetch('/api/launch-app', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: item.id }),
-      })
-      if (!response.ok) throw new Error('Launch failed')
-    } catch {
-      window.location.href = item.fallbackHref
-    }
+  const launchExternalApp = (item: (typeof externalItems)[number]) => {
+    const link = document.createElement('a')
+    link.href = item.href
+    if (item.target) link.target = item.target
+    link.rel = 'noopener noreferrer'
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
   }
 
   return (
