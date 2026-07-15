@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Archive, ArrowDownAZ, ArrowUpAZ, CheckCircle2, ExternalLink, RotateCcw, Search } from 'lucide-react'
+import { Archive, CheckCircle2, ExternalLink, RotateCcw, Search } from 'lucide-react'
 import { AssigneeAvatarStack } from '@/components/common/assignee-avatar-stack'
 import { ModuleFrame, StatStrip } from '@/components/common/module-frame'
 import { GRID_LISTS, type GridTask, useGridStore } from '@/lib/store/grid-store'
@@ -18,6 +18,15 @@ const archiveColumns: Array<{ label: string; sortKey: ArchiveSortKey }> = [
   { label: 'Czas', sortKey: 'trackedMinutes' },
   { label: 'Zamkniete', sortKey: 'updatedAt' },
 ]
+
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
 
 function listName(listId: string) {
   return GRID_LISTS.find((list) => list.id === listId)?.name ?? listId
@@ -189,7 +198,7 @@ export function ArchiveModule() {
           </div>
         </div>
 
-        <div className="madi-scroll-area flex-1">
+        <div className="madi-scroll-area madi-horizontal-scroll flex-1">
           <div className="min-w-[980px]">
             <div className="sticky top-0 z-10 grid grid-cols-[minmax(260px,1.2fr)_minmax(170px,0.8fr)_140px_110px_110px_130px_92px] gap-3 border-b border-border bg-muted/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur">
               {archiveColumns.map((column) => (
@@ -200,9 +209,7 @@ export function ArchiveModule() {
                   className="flex min-w-0 items-center gap-1 text-left hover:text-foreground"
                 >
                   <span className="truncate">{column.label}</span>
-                  {sortKey === column.sortKey && (
-                    <span className="text-primary">{sortDirection === 'asc' ? <ArrowDownAZ size={12} /> : <ArrowUpAZ size={12} />}</span>
-                  )}
+                  <SortIndicator active={sortKey === column.sortKey} direction={sortDirection} />
                 </button>
               ))}
               <span>Akcje</span>

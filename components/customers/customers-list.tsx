@@ -51,6 +51,15 @@ const customerListColumns: Array<{ label: string; sortKey: CustomerSortKey }> = 
   { label: 'Zlecenia', sortKey: 'orders' },
 ]
 
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
+
 function inferredLastOrderDate(customer: Customer) {
   if (!customer.totalOrders) return customer.createdAt
   const date = new Date(customer.createdAt)
@@ -503,8 +512,8 @@ export function CustomersList() {
                 ))}
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-md border border-border bg-background">
-                <div className={`grid min-w-[1120px] ${customerListGrid} gap-3 border-b border-border bg-muted/50 px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground`}>
+              <div className="madi-horizontal-scroll rounded-md border border-border bg-background pb-1">
+                <div className={`grid min-w-[1320px] ${customerListGrid} gap-3 border-b border-border bg-muted/50 px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground`}>
                   {customerListColumns.map((column) => (
                     <button
                       key={column.sortKey}
@@ -513,13 +522,11 @@ export function CustomersList() {
                       className="flex min-w-0 items-center gap-1 text-left hover:text-foreground"
                     >
                       <span className="truncate">{column.label}</span>
-                      {sortKey === column.sortKey && (
-                        <span className="text-primary">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      <SortIndicator active={sortKey === column.sortKey} direction={sortDirection} />
                     </button>
                   ))}
                 </div>
-                <div className="min-w-[1120px]">
+                <div className="min-w-[1320px]">
                   {customers.map((customer) => (
                     <CustomerListRow
                       key={customer.id}

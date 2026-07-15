@@ -1143,12 +1143,9 @@ function EditableListView({ tasks, selectionMode }: { tasks: GridTask[]; selecti
                   title={`Sortuj po kolumnie: ${column.label}`}
                 >
                   <span className="truncate">{column.label}</span>
-                  <span className="flex h-4 w-4 items-center justify-center text-muted-foreground">
-                    {sort.key === column.id ? (
-                      sort.direction === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />
-                    ) : (
-                      <ChevronDown size={12} className="opacity-35" />
-                    )}
+                  <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+                    <span className={sort.key === column.id && sort.direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+                    <span className={sort.key === column.id && sort.direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
                   </span>
                 </button>
               ) : (

@@ -50,6 +50,15 @@ const quoteListColumns: Array<{ label: string; sortKey?: QuoteSortKey }> = [
   { label: 'Akcje' },
 ]
 
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
+
 function compareQuoteValue(a: string | number, b: string | number) {
   if (typeof a === 'number' && typeof b === 'number') return a - b
   return String(a).localeCompare(String(b), 'pl', { sensitivity: 'base' })
@@ -1687,7 +1696,7 @@ export function QuotesModule() {
       case 'quotes':
         return (
           <div>
-            <div className="overflow-x-auto">
+            <div className="madi-horizontal-scroll">
               <div className="min-w-[910px]">
                 <div className="sticky top-0 grid grid-cols-[130px_130px_1fr_100px_120px_132px] gap-2 border-b border-border bg-muted/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {quoteListColumns.map((column) => (
@@ -1698,8 +1707,11 @@ export function QuotesModule() {
                       className="flex min-w-0 items-center gap-1 text-left hover:text-foreground"
                     >
                       <span className="truncate">{column.label}</span>
+                      {column.sortKey && (
+                        <SortIndicator active={quoteSort.key === column.sortKey} direction={quoteSort.direction} />
+                      )}
                       {column.sortKey && quoteSort.key === column.sortKey && (
-                        <span className="text-primary">{quoteSort.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span className="hidden text-primary">{quoteSort.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </button>
                   ))}

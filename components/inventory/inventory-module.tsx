@@ -58,6 +58,15 @@ const inventorySortLabels: Record<InventorySortKey, string> = {
   location: 'Lokalizacja',
 }
 
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
+
 function toNumber(value: string) {
   const parsed = Number.parseFloat(value)
   return Number.isFinite(parsed) ? Math.max(0, parsed) : 0
@@ -478,7 +487,7 @@ export function InventoryModule() {
           </button>
         </div>
 
-        <div className="madi-scroll-area flex-1">
+        <div className="madi-scroll-area madi-horizontal-scroll flex-1">
           {viewMode === 'cards' ? (
             <div className="grid madi-fluid-cards gap-[var(--app-module-gap)] p-[var(--app-module-gap)]">
               {items.map((item) => (
@@ -507,8 +516,9 @@ export function InventoryModule() {
                       className="flex min-w-0 items-center gap-1 text-left hover:text-foreground"
                     >
                       <span className="truncate">{column.label}</span>
+                      <SortIndicator active={sortKey === column.sortKey} direction={sortDirection} />
                       {sortKey === column.sortKey && (
-                        <span className="text-primary">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                        <span className="hidden text-primary">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </button>
                   ) : (

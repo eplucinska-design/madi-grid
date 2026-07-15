@@ -22,6 +22,7 @@ type ScheduleMode = 'day' | 'week'
 type DeliveryKind = 'shipment' | 'pickup'
 type LogisticsStatus = 'draft' | 'planned' | 'route' | 'done'
 type PaymentMethod = 'transfer' | 'cash' | 'card' | 'none'
+type SortDirection = 'asc' | 'desc'
 
 interface LogisticsCourse {
   id: string
@@ -41,6 +42,15 @@ interface LogisticsCourse {
 }
 
 const carriers = ['DPD', 'DHL', 'InPost', 'UPS', 'Pan Darek', 'Pan Mirek', 'Odbior wlasny', 'Kurier miejski']
+
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
 
 const statusColumns: Array<{ id: LogisticsStatus; label: string; tone: string }> = [
   { id: 'draft', label: 'Do zaplanowania', tone: 'bg-muted text-muted-foreground' },
@@ -290,7 +300,7 @@ function ViewButton({ active, icon, label, onClick }: { active: boolean; icon: R
 
 function LogisticsList({ courses, selectedId, onSelect }: { courses: LogisticsCourse[]; selectedId?: string; onSelect: (id: string) => void }) {
   const [sortKey, setSortKey] = useState<keyof LogisticsCourse>('date')
-  const [direction, setDirection] = useState<'asc' | 'desc'>('asc')
+  const [direction, setDirection] = useState<SortDirection>('asc')
   const sorted = [...courses].sort((a, b) => {
     const result = String(a[sortKey]).localeCompare(String(b[sortKey]), 'pl')
     return direction === 'asc' ? result : -result
@@ -302,17 +312,17 @@ function LogisticsList({ courses, selectedId, onSelect }: { courses: LogisticsCo
   }
 
   return (
-    <div className="overflow-auto rounded-md border border-border bg-card">
+    <div className="madi-horizontal-scroll rounded-md border border-border bg-card">
       <table className="w-full min-w-[980px] text-left text-xs">
         <thead className="sticky top-0 z-10 bg-muted text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            <SortableHeader label="Zlecenie" onClick={() => sort('orderNumber')} />
-            <SortableHeader label="Kurs" onClick={() => sort('title')} />
-            <SortableHeader label="Typ" onClick={() => sort('kind')} />
-            <SortableHeader label="Przewoznik" onClick={() => sort('carrier')} />
-            <SortableHeader label="Platnosc" onClick={() => sort('paymentMethod')} />
-            <SortableHeader label="Termin" onClick={() => sort('date')} />
-            <SortableHeader label="Status" onClick={() => sort('status')} />
+            <SortableHeader label="Zlecenie" active={sortKey === 'orderNumber'} direction={direction} onClick={() => sort('orderNumber')} />
+            <SortableHeader label="Kurs" active={sortKey === 'title'} direction={direction} onClick={() => sort('title')} />
+            <SortableHeader label="Typ" active={sortKey === 'kind'} direction={direction} onClick={() => sort('kind')} />
+            <SortableHeader label="Przewoznik" active={sortKey === 'carrier'} direction={direction} onClick={() => sort('carrier')} />
+            <SortableHeader label="Platnosc" active={sortKey === 'paymentMethod'} direction={direction} onClick={() => sort('paymentMethod')} />
+            <SortableHeader label="Termin" active={sortKey === 'date'} direction={direction} onClick={() => sort('date')} />
+            <SortableHeader label="Status" active={sortKey === 'status'} direction={direction} onClick={() => sort('status')} />
           </tr>
         </thead>
         <tbody>
@@ -336,10 +346,13 @@ function LogisticsList({ courses, selectedId, onSelect }: { courses: LogisticsCo
   )
 }
 
-function SortableHeader({ label, onClick }: { label: string; onClick: () => void }) {
+function SortableHeader({ label, active, direction, onClick }: { label: string; active: boolean; direction: SortDirection; onClick: () => void }) {
   return (
     <th className="border-b border-border px-3 py-2">
-      <button onClick={onClick} className="font-semibold hover:text-foreground">{label}</button>
+      <button onClick={onClick} className="flex w-full items-center gap-1 font-semibold hover:text-foreground">
+        <span className="truncate">{label}</span>
+        <SortIndicator active={active} direction={direction} />
+      </button>
     </th>
   )
 }

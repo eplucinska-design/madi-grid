@@ -46,6 +46,15 @@ interface StudioTask extends MadiGridGrafikTask {
   comments: Array<{ id: string; author: string; text: string; createdAt: string }>
 }
 
+function SortIndicator({ active, direction }: { active: boolean; direction: SortDirection }) {
+  return (
+    <span className="ml-auto flex h-4 w-3 shrink-0 flex-col items-center justify-center text-[9px] leading-[7px]" aria-hidden="true">
+      <span className={active && direction === 'asc' ? 'text-primary' : 'text-muted-foreground/45'}>^</span>
+      <span className={active && direction === 'desc' ? 'text-primary' : 'text-muted-foreground/45'}>v</span>
+    </span>
+  )
+}
+
 const DAY_CAPACITY_MINUTES = 360
 const VISIBLE_TASKS = MADI_GRID_GRAFIK_TASKS.slice(0, 12)
 
@@ -903,9 +912,7 @@ function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; select
             className="group relative flex h-9 items-center gap-1 px-3 text-left hover:bg-muted"
           >
             <span className="truncate">{column.label}</span>
-            {column.sortKey && sort.key === column.sortKey && (
-              <span className="text-primary">{sort.direction === 'asc' ? '↑' : '↓'}</span>
-            )}
+            {column.sortKey && <SortIndicator active={sort.key === column.sortKey} direction={sort.direction} />}
             <span
               role="separator"
               aria-label={`Zmien szerokosc kolumny ${column.label}`}

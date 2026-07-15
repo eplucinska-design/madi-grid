@@ -408,7 +408,7 @@ function ReportSection({ title, icon, children }: { title: string; icon: React.R
 function ReportTable({ columns, rows, empty }: { columns: string[]; rows: Array<Array<string | number>>; empty: string }) {
   if (!rows.length) return <EmptyBox text={empty} />
   return (
-    <div className="overflow-x-auto">
+    <div className="madi-horizontal-scroll">
       <table className="w-full min-w-[620px] text-left text-xs">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>

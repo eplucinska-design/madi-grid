@@ -285,6 +285,12 @@
     min-height: 0;
   }
 
+  .madi-horizontal-scroll {
+    overflow-x: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
+  }
+
   .madi-row {
     min-height: var(--app-row-min-height);
   }
