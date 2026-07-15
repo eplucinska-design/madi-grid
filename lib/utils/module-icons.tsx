@@ -1,0 +1,55 @@
+import {
+  AlertTriangle,
+  Archive,
+  BarChart3,
+  BookOpen,
+  Calculator,
+  Calendar,
+  Gauge,
+  Factory,
+  FileText,
+  FolderOpen,
+  Home,
+  LayoutDashboard,
+  Megaphone,
+  Package,
+  Printer,
+  Receipt,
+  Settings,
+  Timer,
+  Truck,
+  Users,
+} from 'lucide-react'
+import type { ModuleId } from '@/lib/types'
+
+export function moduleIcon(moduleId: ModuleId, size = 14) {
+  const iconProps = { size, strokeWidth: 2 }
+  const icons: Record<ModuleId, React.ReactNode> = {
+    start: <Home {...iconProps} />,
+    grid: <LayoutDashboard {...iconProps} />,
+    dashboard: <LayoutDashboard {...iconProps} />,
+    customers: <Users {...iconProps} />,
+    quotes: <Calculator {...iconProps} />,
+    'quotes-list': <FileText {...iconProps} />,
+    'quotes-products': <Package {...iconProps} />,
+    studio: <Gauge {...iconProps} />,
+    'studio-design': <LayoutDashboard {...iconProps} />,
+    orders: <FileText {...iconProps} />,
+    files: <FolderOpen {...iconProps} />,
+    prepress: <Printer {...iconProps} />,
+    production: <Factory {...iconProps} />,
+    planning: <Calendar {...iconProps} />,
+    'active-work': <Timer {...iconProps} />,
+    logistics: <Truck {...iconProps} />,
+    invoices: <Receipt {...iconProps} />,
+    complaints: <AlertTriangle {...iconProps} />,
+    inventory: <Package {...iconProps} />,
+    documents: <BookOpen {...iconProps} />,
+    communication: <FileText {...iconProps} />,
+    marketing: <Megaphone {...iconProps} />,
+    reports: <BarChart3 {...iconProps} />,
+    archive: <Archive {...iconProps} />,
+    settings: <Settings {...iconProps} />,
+  }
+  return icons[moduleId]
+}
