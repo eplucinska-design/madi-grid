@@ -100,7 +100,7 @@ const priorityColors: Record<OrderPriority, string> = {
 const viewTabs: { id: GridView; label: string; icon: React.ReactNode }[] = [
   { id: 'board', label: 'Board', icon: <LayoutGrid size={14} /> },
   { id: 'list', label: 'Lista', icon: <List size={14} /> },
-  { id: 'calendar', label: 'Terminy', icon: <Calendar size={14} /> },
+  { id: 'calendar', label: 'Kalendarz', icon: <Calendar size={14} /> },
 ]
 
 const defaultModulePrefs: ModuleViewPrefs = {

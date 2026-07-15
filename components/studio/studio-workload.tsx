@@ -8,9 +8,13 @@ import {
   CalendarDays,
   CheckCircle2,
   CheckCheck,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Columns3,
   ExternalLink,
+  GripVertical,
   LayoutDashboard,
   List,
   MessageSquare,
@@ -185,7 +189,7 @@ function newestWaitingTask(tasks: StudioTask[]) {
 
 function StudioViewSwitch({ value, onChange }: { value: StudioView; onChange: (view: StudioView) => void }) {
   const options: Array<{ id: StudioView; label: string; icon: React.ReactNode }> = [
-    { id: 'overview', label: 'Oblozenie', icon: <LayoutDashboard size={14} /> },
+    { id: 'overview', label: 'Podsumowanie', icon: <LayoutDashboard size={14} /> },
     { id: 'board', label: 'Board', icon: <Columns3 size={14} /> },
     { id: 'list', label: 'Lista', icon: <List size={14} /> },
     { id: 'calendar', label: 'Kalendarz', icon: <CalendarDays size={14} /> },
@@ -208,6 +212,36 @@ function StudioViewSwitch({ value, onChange }: { value: StudioView; onChange: (v
       ))}
     </div>
   )
+}
+
+function useManualTaskOrder(tasks: StudioTask[]) {
+  const [order, setOrder] = useState<string[]>(() => tasks.map((task) => task.id))
+
+  useEffect(() => {
+    setOrder((current) => {
+      const visibleIds = tasks.map((task) => task.id)
+      const visibleSet = new Set(visibleIds)
+      return [...current.filter((id) => visibleSet.has(id)), ...visibleIds.filter((id) => !current.includes(id))]
+    })
+  }, [tasks])
+
+  const orderedTasks = useMemo(() => {
+    const byId = new Map(tasks.map((task) => [task.id, task]))
+    return order.map((id) => byId.get(id)).filter((task): task is StudioTask => Boolean(task))
+  }, [order, tasks])
+
+  const moveTask = (draggedId: string, targetId: string) => {
+    if (!draggedId || draggedId === targetId) return
+    setOrder((current) => {
+      const next = current.filter((id) => id !== draggedId)
+      const targetIndex = next.indexOf(targetId)
+      if (targetIndex < 0) return current
+      next.splice(targetIndex, 0, draggedId)
+      return next
+    })
+  }
+
+  return { orderedTasks, moveTask }
 }
 
 const metricToneClasses = {
@@ -657,21 +691,41 @@ function OverviewView({
   )
 }
 
-function StudioTaskCard({ task, selected, onSelect }: { task: StudioTask; selected: boolean; onSelect: () => void }) {
+function StudioTaskCard({
+  task,
+  selected,
+  onSelect,
+  onDragStart,
+  onDrop,
+}: {
+  task: StudioTask
+  selected: boolean
+  onSelect: () => void
+  onDragStart?: (event: React.DragEvent<HTMLButtonElement>) => void
+  onDrop?: (event: React.DragEvent<HTMLButtonElement>) => void
+}) {
   const value = progress(task)
 
   return (
     <button
       type="button"
+      draggable
       onClick={onSelect}
       onDoubleClick={() => openStudioTask(task)}
-      className={`madi-responsive-card w-full rounded-md border bg-card p-3 text-left transition hover:border-primary/40 hover:bg-muted/25 ${
+      onDragStart={onDragStart}
+      onDragOver={(event) => {
+        event.preventDefault()
+        event.dataTransfer.dropEffect = 'move'
+      }}
+      onDrop={onDrop}
+      className={`madi-responsive-card min-h-[150px] w-full resize overflow-auto rounded-md border bg-card p-3 text-left transition hover:border-primary/40 hover:bg-muted/25 ${
         selected ? 'border-primary/60 bg-primary/5 shadow-[inset_3px_0_0_hsl(var(--primary))]' : 'border-border'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
+            <GripVertical size={14} className="shrink-0 cursor-grab text-muted-foreground" />
             <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: statusDot[task.statusId] }} />
             <p className="line-clamp-2 text-sm font-semibold leading-snug">{task.title}</p>
             <StudioCorrectionSignal task={task} />
@@ -714,6 +768,7 @@ function StudioTaskCard({ task, selected, onSelect }: { task: StudioTask; select
 }
 
 function BoardView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selectedId: string; onSelect: (id: string) => void }) {
+  const { orderedTasks, moveTask } = useManualTaskOrder(tasks)
   const columns: Array<{ id: StudioStatus; title: string }> = [
     { id: 'waiting', title: 'Do startu' },
     { id: 'active', title: 'W toku' },
@@ -724,7 +779,7 @@ function BoardView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selec
   return (
     <div className="grid w-max min-w-[980px] grid-cols-4 gap-3">
       {columns.map((column) => {
-        const columnTasks = tasks.filter((task) => task.statusId === column.id)
+        const columnTasks = orderedTasks.filter((task) => task.statusId === column.id)
         return (
           <section key={column.id} className="flex h-[min(620px,calc(100vh-260px))] min-h-[420px] min-w-0 flex-col rounded-md border border-border bg-background">
             <header className="flex items-center justify-between border-b border-border px-3 py-2.5">
@@ -740,7 +795,20 @@ function BoardView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selec
             <div className="madi-scroll-area flex-1 space-y-2 p-2">
               {columnTasks.length ? (
                 columnTasks.map((task) => (
-                  <StudioTaskCard key={task.id} task={task} selected={task.id === selectedId} onSelect={() => onSelect(task.id)} />
+                  <StudioTaskCard
+                    key={task.id}
+                    task={task}
+                    selected={task.id === selectedId}
+                    onSelect={() => onSelect(task.id)}
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData('application/x-madi-studio-task', task.id)
+                      event.dataTransfer.effectAllowed = 'move'
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault()
+                      moveTask(event.dataTransfer.getData('application/x-madi-studio-task'), task.id)
+                    }}
+                  />
                 ))
               ) : (
                 <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
@@ -757,7 +825,10 @@ function BoardView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selec
 
 function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selectedId: string; onSelect: (id: string) => void }) {
   const [sort, setSort] = useState<{ key: StudioSortKey; direction: SortDirection }>({ key: 'deadline', direction: 'asc' })
+  const [manualOrderActive, setManualOrderActive] = useState(false)
+  const { orderedTasks, moveTask } = useManualTaskOrder(tasks)
   const [widths, setWidths] = useState<Record<string, number>>({
+    handle: 42,
     title: 360,
     status: 150,
     client: 210,
@@ -767,6 +838,7 @@ function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; select
   })
 
   const columns: Array<{ key: keyof typeof widths; label: string; sortKey?: StudioSortKey; min: number }> = [
+    { key: 'handle', label: '', min: 38 },
     { key: 'title', label: 'Zadanie', sortKey: 'title', min: 240 },
     { key: 'status', label: 'Status', sortKey: 'status', min: 120 },
     { key: 'client', label: 'Klient', sortKey: 'client', min: 160 },
@@ -776,6 +848,7 @@ function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; select
   ]
   const template = columns.map((column) => `${widths[column.key]}px`).join(' ')
   const sortedTasks = useMemo(() => {
+    if (manualOrderActive) return orderedTasks
     const valueFor = (task: StudioTask) => {
       if (sort.key === 'status') return statusLabels[task.statusId]
       if (sort.key === 'client') return task.client
@@ -791,10 +864,11 @@ function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; select
         : String(aValue).localeCompare(String(bValue), 'pl')
       return sort.direction === 'asc' ? result : -result
     })
-  }, [sort, tasks])
+  }, [manualOrderActive, orderedTasks, sort, tasks])
 
   const changeSort = (key?: StudioSortKey) => {
     if (!key) return
+    setManualOrderActive(false)
     setSort((current) => ({
       key,
       direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
@@ -845,13 +919,30 @@ function ListView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; select
         <button
           key={task.id}
           type="button"
+          draggable
           onClick={() => onSelect(task.id)}
           onDoubleClick={() => openStudioTask(task)}
+          onDragStart={(event) => {
+            event.dataTransfer.setData('application/x-madi-studio-task', task.id)
+            event.dataTransfer.effectAllowed = 'move'
+          }}
+          onDragOver={(event) => {
+            event.preventDefault()
+            event.dataTransfer.dropEffect = 'move'
+          }}
+          onDrop={(event) => {
+            event.preventDefault()
+            setManualOrderActive(true)
+            moveTask(event.dataTransfer.getData('application/x-madi-studio-task'), task.id)
+          }}
           className={`grid w-full items-center border-b border-border text-left last:border-b-0 hover:bg-muted/30 ${
             selectedId === task.id ? 'bg-primary/5 shadow-[inset_3px_0_0_hsl(var(--primary))]' : ''
           }`}
           style={{ gridTemplateColumns: template }}
         >
+          <span className="flex justify-center px-3 py-2.5 text-muted-foreground">
+            <GripVertical size={14} className="cursor-grab" />
+          </span>
           <span className="min-w-0 px-3 py-2.5">
             <span className="block truncate text-sm font-semibold">{task.title}</span>
             <span className="block truncate font-mono text-[11px] text-muted-foreground">{task.orderNumber}</span>
@@ -962,6 +1053,197 @@ function CalendarView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; se
           </section>
         )
       })}
+      </div>
+    </div>
+  )
+}
+
+function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: StudioTask[]; selectedId: string; onSelect: (id: string) => void }) {
+  const [mode, setMode] = useState<StudioCalendarMode>('month')
+  const [cursorDate, setCursorDate] = useState(() => new Date('2026-07-14T12:00:00'))
+  const [expandedDate, setExpandedDate] = useState<string | null>(null)
+  const dayNames = ['Pon', 'Wt', 'Sr', 'Czw', 'Pt', 'Sob', 'Nd']
+  const toIso = (date: Date) => date.toISOString().slice(0, 10)
+  const addDays = (date: Date, amount: number) => {
+    const next = new Date(date)
+    next.setDate(next.getDate() + amount)
+    return next
+  }
+  const startWeek = (date: Date) => addDays(date, -((date.getDay() + 6) % 7))
+  const days = useMemo(() => {
+    const start = mode === 'day'
+      ? cursorDate
+      : mode === 'week'
+        ? startWeek(cursorDate)
+        : startWeek(new Date(cursorDate.getFullYear(), cursorDate.getMonth(), 1))
+    const length = mode === 'day' ? 1 : mode === 'week' ? 7 : 42
+    return Array.from({ length }, (_, index) => addDays(start, index))
+  }, [cursorDate, mode])
+  const tasksByDate = useMemo(() => {
+    const grouped = new Map<string, StudioTask[]>()
+    tasks.forEach((task, index) => {
+      const iso = task.deadline.slice(0, 10) || `2026-07-${String((index % 28) + 1).padStart(2, '0')}`
+      grouped.set(iso, [...(grouped.get(iso) ?? []), task])
+    })
+    return grouped
+  }, [tasks])
+  const monthLabel = new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' }).format(cursorDate)
+  const visibleTasks = days.flatMap((day) => tasksByDate.get(toIso(day)) ?? [])
+  const expandedIndex = expandedDate ? days.findIndex((day) => toIso(day) === expandedDate) : -1
+  const expandedRow = expandedIndex >= 0 ? Math.floor(expandedIndex / 7) : -1
+  const expandedTaskCount = expandedDate ? (tasksByDate.get(expandedDate)?.length ?? 0) : 0
+  const expandedRowHeight = Math.max(260, 154 + Math.max(0, expandedTaskCount - 1) * 64)
+  const calendarRows = mode === 'day' ? 1 : Math.ceil(days.length / 7)
+  const gridRows = mode === 'day'
+    ? 'minmax(520px, 1fr)'
+    : mode === 'week'
+      ? 'minmax(420px, 1fr)'
+      : Array.from({ length: calendarRows }, (_, row) =>
+          row === expandedRow ? `minmax(${expandedRowHeight}px, max-content)` : 'minmax(154px, 1fr)'
+        ).join(' ')
+
+  const navigate = (direction: -1 | 1) => {
+    setCursorDate((current) => {
+      if (mode === 'day') return addDays(current, direction)
+      if (mode === 'week') return addDays(current, direction * 7)
+      return new Date(current.getFullYear(), current.getMonth() + direction, 1)
+    })
+    setExpandedDate(null)
+  }
+
+  return (
+    <div className="flex h-full min-w-[980px] flex-col overflow-hidden rounded-md border border-border bg-card">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border p-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <CalendarDays size={16} className="text-primary" />
+            <h3 className="truncate text-sm font-semibold capitalize">{mode === 'day' ? toIso(cursorDate) : monthLabel}</h3>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {visibleTasks.length} zadan, plan {formatMinutes(visibleTasks.reduce((sum, task) => sum + task.minutes, 0))}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center rounded-md border border-border bg-background">
+            <button type="button" onClick={() => navigate(-1)} className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:bg-muted">
+              <ChevronLeft size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setCursorDate(new Date('2026-07-14T12:00:00'))
+                setExpandedDate(null)
+              }}
+              className="h-8 border-x border-border px-3 text-xs font-medium hover:bg-muted"
+            >
+              Dzisiaj
+            </button>
+            <button type="button" onClick={() => navigate(1)} className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:bg-muted">
+              <ChevronRight size={15} />
+            </button>
+          </div>
+          <div className="flex items-center rounded-md bg-muted p-1">
+            {(['day', 'week', 'month'] as StudioCalendarMode[]).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => {
+                  setMode(item)
+                  setExpandedDate(null)
+                }}
+                className={`h-7 rounded px-3 text-xs font-medium ${
+                  mode === item ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {item === 'day' ? 'Dzien' : item === 'week' ? 'Tydzien' : 'Miesiac'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {mode !== 'day' && (
+        <div className="grid shrink-0 grid-cols-7 border-b border-border bg-muted/40 text-[11px] font-semibold uppercase text-muted-foreground">
+          {dayNames.map((day) => (
+            <div key={day} className="border-r border-border px-2 py-2 last:border-r-0">{day}</div>
+          ))}
+        </div>
+      )}
+
+      <div className={`grid madi-scroll-area flex-1 ${mode === 'day' ? 'grid-cols-1' : 'grid-cols-7'}`} style={{ gridTemplateRows: gridRows }}>
+        {days.map((day) => {
+          const iso = toIso(day)
+          const dayTasks = tasksByDate.get(iso) ?? []
+          const outside = mode === 'month' && day.getMonth() !== cursorDate.getMonth()
+          const isExpanded = expandedDate === iso
+          const baseLimit = mode === 'month' ? 1 : 5
+          const visibleLimit = isExpanded ? dayTasks.length : baseLimit
+          const minutes = dayTasks.reduce((sum, task) => sum + task.minutes, 0)
+
+          return (
+            <section
+              key={iso}
+              className={`flex min-h-0 flex-col border-b border-r border-border p-2 last:border-r-0 ${
+                outside ? 'bg-muted/15 text-muted-foreground' : 'bg-background'
+              } ${isExpanded ? 'bg-primary/[0.03] ring-1 ring-inset ring-primary/30' : ''}`}
+            >
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCursorDate(day)
+                    setMode('day')
+                    setExpandedDate(null)
+                  }}
+                  className="flex h-7 min-w-7 items-center justify-center rounded px-1.5 text-xs font-semibold hover:bg-muted"
+                >
+                  {mode === 'day' ? iso : day.getDate()}
+                </button>
+                <div className="text-right text-[10px] text-muted-foreground">
+                  <p>{dayTasks.length} zad.</p>
+                  {minutes > 0 && <p>{formatMinutes(minutes)}</p>}
+                </div>
+              </div>
+
+              <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+                {dayTasks.slice(0, visibleLimit).map((task, index) => (
+                  <button
+                    key={task.id}
+                    type="button"
+                    draggable
+                    onClick={() => onSelect(task.id)}
+                    onDoubleClick={() => openStudioTask(task)}
+                    className={`group w-full rounded-md border px-2 py-1.5 text-left shadow-sm transition-colors hover:border-primary/60 hover:bg-muted/30 ${
+                      selectedId === task.id ? 'border-primary bg-primary/5' : 'border-border bg-card'
+                    }`}
+                  >
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <span className="text-[10px] font-semibold text-primary">{index === 0 ? '08:30' : index === 1 ? '10:30' : '12:40'}</span>
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: statusDot[task.statusId] }} />
+                      <span className="truncate text-[11px] font-semibold text-foreground">{task.title}</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <span className="truncate text-[10px] text-muted-foreground">{task.orderNumber}</span>
+                      <span className="text-[10px] text-muted-foreground">{formatMinutes(task.minutes)}</span>
+                    </div>
+                  </button>
+                ))}
+                {(dayTasks.length > baseLimit || isExpanded) && mode !== 'day' && (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedDate((current) => (current === iso ? null : iso))}
+                    className={`mt-auto flex min-h-8 w-full items-center justify-center gap-1 rounded-md border border-dashed px-1 text-[11px] font-medium hover:border-primary hover:text-foreground ${
+                      isExpanded ? 'border-primary bg-primary/10 text-foreground' : 'border-border text-muted-foreground'
+                    }`}
+                  >
+                    <ChevronDown size={12} className={isExpanded ? 'rotate-180' : ''} />
+                    {isExpanded ? 'zwin dzien' : `+${dayTasks.length - baseLimit} wiecej`}
+                  </button>
+                )}
+              </div>
+            </section>
+          )
+        })}
       </div>
     </div>
   )
@@ -1450,7 +1732,7 @@ export function StudioWorkload({
           )}
           {view === 'board' && <BoardView tasks={filteredTasks} selectedId={selectedTask?.id ?? ''} onSelect={setSelectedId} />}
           {view === 'list' && <ListView tasks={filteredTasks} selectedId={selectedTask?.id ?? ''} onSelect={setSelectedId} />}
-          {view === 'calendar' && <CalendarView tasks={filteredTasks} selectedId={selectedTask?.id ?? ''} onSelect={setSelectedId} />}
+          {view === 'calendar' && <StudioUnifiedCalendarView tasks={filteredTasks} selectedId={selectedTask?.id ?? ''} onSelect={setSelectedId} />}
         </div>
       </div>
       {correctionTask && (
