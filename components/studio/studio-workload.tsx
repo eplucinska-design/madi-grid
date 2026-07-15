@@ -1256,7 +1256,7 @@ function StudioUnifiedCalendarView({ tasks, selectedId, onSelect }: { tasks: Stu
   )
 }
 
-function StudioAside({ task, onOpen, onDone }: { task: StudioTask; onOpen: () => void; onDone: () => void }) {
+function StudioAside({ task, onOpen, onDone, onRework }: { task: StudioTask; onOpen: () => void; onDone: () => void; onRework: () => void }) {
   return (
     <aside className="flex min-h-0 flex-col bg-background">
       <header className="shrink-0 border-b border-border p-4">
@@ -1289,9 +1289,13 @@ function StudioAside({ task, onOpen, onDone }: { task: StudioTask; onOpen: () =>
             {[
               ['Typ pracy', task.queueLabel === 'Zalegle' ? 'Grafik - przygotowanie plikow' : task.queueLabel],
               ['Zlecajacy', task.assignee.replace('EEmilka', 'Emilia')],
+              ['Klient', task.client],
+              ['Nr ZG', task.orderNumber],
+              ['Priorytet', task.priorityLabel],
               ['Termin', task.deadline],
               ['Szacowany czas', formatMinutes(task.minutes)],
               ['Rzeczywisty czas', formatMinutes(task.trackedMinutes)],
+              ['Ostatni etap', task.statusId === 'active' ? 'W toku' : 'Brak historii'],
             ].map(([label, value]) => (
               <div key={label} className="grid grid-cols-[112px_minmax(0,1fr)] gap-2 border-b border-border pb-2 last:border-b-0 last:pb-0">
                 <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
@@ -1312,6 +1316,14 @@ function StudioAside({ task, onOpen, onDone }: { task: StudioTask; onOpen: () =>
             <button className="text-xs font-semibold text-primary">Kopiuj</button>
           </div>
           <p className="break-words font-mono text-xs text-primary">{task.path}</p>
+        </section>
+
+        <section className="mt-3 rounded-md border border-border bg-card p-3">
+          <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Czas pracy</p>
+          <div className="rounded-md bg-muted/45 p-4 text-center">
+            <p className="font-mono text-3xl font-bold tabular-nums">{formatMinutes(task.minutes)}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">Plan dla przygotowania graficznego / DTP</p>
+          </div>
         </section>
 
         <section className="mt-3 rounded-md border border-border bg-card p-3">
@@ -1345,6 +1357,9 @@ function StudioAside({ task, onOpen, onDone }: { task: StudioTask; onOpen: () =>
           </button>
           <button className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
             <MessageSquare size={14} /> Komentarz
+          </button>
+          <button onClick={onRework} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
+            <AlertTriangle size={14} /> Poprawka
           </button>
           <button onClick={onOpen} className="flex h-9 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-sm font-semibold hover:bg-muted">
             <ExternalLink size={14} /> Okno
@@ -1694,12 +1709,11 @@ export function StudioWorkload({
       )}
       bodyClassName="overflow-hidden bg-workspace-surface"
       aside={selectedTask ? (
-        <StudioActivityAside
-          tasks={filteredTasks}
-          selectedTask={selectedTask}
-          onSelect={setSelectedId}
+        <StudioAside
+          task={selectedTask}
           onOpen={openSelected}
           onDone={() => markDone(selectedTask.id)}
+          onRework={() => setCorrectionTask(selectedTask)}
         />
       ) : undefined}
     >

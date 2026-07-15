@@ -224,12 +224,12 @@ function readQuotePanelSizes(): QuotePanelSizes {
 }
 
 function readQuoteGridColumns(): QuoteGridColumns {
-  if (typeof window === 'undefined') return 'auto'
+  if (typeof window === 'undefined') return '1'
   try {
     const saved = window.localStorage.getItem(QUOTE_GRID_COLUMNS_STORAGE_KEY)
-    return saved === '1' || saved === '2' || saved === '3' || saved === '4' || saved === 'auto' ? saved : 'auto'
+    return saved === '1' || saved === '2' || saved === '3' || saved === '4' || saved === 'auto' ? saved : '1'
   } catch {
-    return 'auto'
+    return '1'
   }
 }
 
@@ -263,7 +263,7 @@ function layoutFromPanelOrder(order: QuotePanelId[]): QuotePanelLayout {
 }
 
 function quotePanelBodyClass() {
-  return 'madi-scroll-area max-h-[calc(100vh-220px)]'
+  return 'overflow-visible'
 }
 
 function quotePanelGridColumn(size: StartTileSize, columns: QuoteGridColumns, expanded: boolean) {
@@ -1235,7 +1235,7 @@ export function QuotesModule() {
   const [panelLayoutReady, setPanelLayoutReady] = useState(false)
   const [dragPanelId, setDragPanelId] = useState<QuotePanelId | null>(null)
   const [expandedPanelId, setExpandedPanelId] = useState<QuotePanelId | null>(null)
-  const [gridColumns, setGridColumns] = useState<QuoteGridColumns>('auto')
+  const [gridColumns, setGridColumns] = useState<QuoteGridColumns>('1')
   const [workspaceMode, setWorkspaceMode] = useState<QuoteWorkspaceMode>('grid')
   const [detailPanelCollapsed, setDetailPanelCollapsed] = useState(false)
   const [quoteSort, setQuoteSort] = useState<{ key: QuoteSortKey; direction: SortDirection }>({ key: 'number', direction: 'asc' })
@@ -1359,7 +1359,7 @@ export function QuotesModule() {
         onClick={() => {
           setPanelLayout(defaultQuotePanelLayout)
           setPanelSizes(defaultQuotePanelSizes)
-          setGridColumns('auto')
+          setGridColumns('1')
           setWorkspaceMode('grid')
           setDetailPanelCollapsed(false)
           setExpandedPanelId(null)
