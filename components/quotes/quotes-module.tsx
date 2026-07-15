@@ -19,7 +19,7 @@ import {
   X,
 } from 'lucide-react'
 import { ModuleFrame, StatStrip } from '@/components/common/module-frame'
-import { TileSizeControl } from '@/components/start/section-shell'
+import { TileResizeHandle } from '@/components/start/section-shell'
 import {
   useQuotesStore,
   type QuoteProcess,
@@ -481,7 +481,7 @@ function QuoteWorkspacePanel({
     <section
       data-quote-panel-id={id}
       style={{ gridColumn }}
-      className={`madi-responsive-card rounded-md border border-border bg-card shadow-sm ${size === 'full' ? 'ring-1 ring-primary/10' : ''} ${draggingId === id ? 'opacity-50' : ''}`}
+      className={`group/tile relative madi-responsive-card rounded-md border border-border bg-card shadow-sm ${size === 'full' ? 'ring-1 ring-primary/10' : ''} ${draggingId === id ? 'opacity-50' : ''}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/20 px-3 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
@@ -492,7 +492,6 @@ function QuoteWorkspacePanel({
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <TileSizeControl value={size} onChange={(nextSize) => onSizeChange(id, nextSize)} />
           <button
             onClick={() => onExpand(id)}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -503,6 +502,7 @@ function QuoteWorkspacePanel({
         </div>
       </div>
       <div className={quotePanelBodyClass()}>{children}</div>
+      <TileResizeHandle value={size} onChange={(nextSize) => onSizeChange(id, nextSize)} />
     </section>
   )
 }

@@ -25,7 +25,7 @@ import {
   type StartWidgetId,
 } from '@/lib/store/start-store'
 import { getTasksForUser, getDayPlanForUser, getActivityForUser } from '@/lib/data/workspace-data'
-import { SectionShell, TileSizeControl } from './section-shell'
+import { SectionShell, TileResizeHandle } from './section-shell'
 import { ActiveTaskCard } from './active-task-card'
 import { DayPlan } from './day-plan'
 import { ProductionPanel } from './production-panel'
@@ -302,13 +302,7 @@ export function StartView() {
       <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         <div data-start-view-content className="madi-scroll-area flex-1 p-[var(--app-module-gap)]">
           <div data-start-view-grid className="grid min-w-0 auto-rows-min gap-[var(--app-module-gap)] [grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr))]">
-            <div className={`min-w-0 ${tileSpanClass(tileSize('active-task', 'full'))}`}>
-              <div className="mb-2 flex justify-end">
-                <TileSizeControl
-                  value={tileSize('active-task', 'full')}
-                  onChange={(size) => setTileSize('active-task', size)}
-                />
-              </div>
+            <div className={`group/tile relative min-w-0 ${tileSpanClass(tileSize('active-task', 'full'))}`}>
               {activeTask ? (
                 <ActiveTaskCard task={activeTask} onMarkDone={markDone} onSendToRework={markDone} />
               ) : (
@@ -318,6 +312,10 @@ export function StartView() {
                   <p className="text-[12px] text-muted-foreground">Uruchom timer na zadaniu z planu lub kolejki.</p>
                 </div>
               )}
+              <TileResizeHandle
+                value={tileSize('active-task', 'full')}
+                onChange={(size) => setTileSize('active-task', size)}
+              />
             </div>
 
             {order.map((id) => (

@@ -30,36 +30,58 @@ interface SectionShellProps {
 
 const tileSizeOptions: StartTileSize[] = ['sm', 'md', 'lg', 'full']
 
-const tileSizeLabels: Record<StartTileSize, string> = {
-  sm: 'S',
-  md: 'M',
-  lg: 'L',
-  full: 'XL',
-}
-
-export function TileSizeControl({
+export function TileResizeHandle({
   value,
   onChange,
+  className = '',
 }: {
   value: StartTileSize
   onChange: (size: StartTileSize) => void
+  className?: string
 }) {
+  const resizeStartRef = useRef<{ x: number; y: number; index: number } | null>(null)
+
+  const startTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const startIndex = tileSizeOptions.indexOf(value)
+    resizeStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      index: startIndex >= 0 ? startIndex : 1,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  const moveTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const start = resizeStartRef.current
+    if (!start) return
+    const delta = Math.max(event.clientX - start.x, event.clientY - start.y)
+    const steps = Math.round(delta / 120)
+    const nextIndex = Math.max(0, Math.min(tileSizeOptions.length - 1, start.index + steps))
+    onChange(tileSizeOptions[nextIndex])
+  }
+
+  const stopTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
+    resizeStartRef.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
   return (
-    <div className="flex items-center rounded-md border border-border bg-background p-0.5">
-      {tileSizeOptions.map((size) => (
-        <button
-          key={size}
-          type="button"
-          onClick={() => onChange(size)}
-          className={`h-6 min-w-6 rounded px-1.5 text-[10px] font-semibold transition-colors ${
-            value === size ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-          }`}
-          title={`Rozmiar kafelka ${tileSizeLabels[size]}`}
-        >
-          {tileSizeLabels[size]}
-        </button>
-      ))}
-    </div>
+    <button
+      type="button"
+      onPointerDown={startTileResize}
+      onPointerMove={moveTileResize}
+      onPointerUp={stopTileResize}
+      onPointerCancel={stopTileResize}
+      className={`absolute bottom-1 right-1 flex h-6 w-6 cursor-nwse-resize items-center justify-center rounded-md text-muted-foreground/45 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover/tile:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${className}`}
+      title="Zmien rozmiar kafelka przeciagajac rog"
+      aria-label="Zmien rozmiar kafelka"
+    >
+      <Grip size={13} />
+    </button>
   )
 }
 
@@ -82,36 +104,6 @@ export function SectionShell({
   children,
 }: SectionShellProps) {
   const { setCurrentModule } = useAppStore()
-  const resizeStartRef = useRef<{ x: number; y: number; index: number } | null>(null)
-
-  const startTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!onSizeChange) return
-    event.preventDefault()
-    event.stopPropagation()
-    const startIndex = tileSizeOptions.indexOf(size)
-    resizeStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      index: startIndex >= 0 ? startIndex : 1,
-    }
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  const moveTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const start = resizeStartRef.current
-    if (!start || !onSizeChange) return
-    const delta = Math.max(event.clientX - start.x, event.clientY - start.y)
-    const steps = Math.round(delta / 120)
-    const nextIndex = Math.max(0, Math.min(tileSizeOptions.length - 1, start.index + steps))
-    onSizeChange(tileSizeOptions[nextIndex])
-  }
-
-  const stopTileResize = (event: React.PointerEvent<HTMLButtonElement>) => {
-    resizeStartRef.current = null
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-  }
 
   return (
     <section
@@ -188,18 +180,7 @@ export function SectionShell({
       {!collapsed && <div className="min-w-0 px-3 pb-3">{children}</div>}
 
       {onSizeChange && (
-        <button
-          type="button"
-          onPointerDown={startTileResize}
-          onPointerMove={moveTileResize}
-          onPointerUp={stopTileResize}
-          onPointerCancel={stopTileResize}
-          className="absolute bottom-1 right-1 flex h-6 w-6 cursor-nwse-resize items-center justify-center rounded-md text-muted-foreground/45 opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover/tile:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          title="Zmien rozmiar kafelka przeciagajac rog"
-          aria-label="Zmien rozmiar kafelka"
-        >
-          <Grip size={13} />
-        </button>
+        <TileResizeHandle value={size} onChange={onSizeChange} />
       )}
     </section>
   )
