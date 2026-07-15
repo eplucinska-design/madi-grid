@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type DragEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import {
+  AlertTriangle,
   ArrowDown,
   ArrowUp,
   Brush,
@@ -150,6 +151,33 @@ function getPinnedComment(task: GridTask) {
   return [...task.comments]
     .filter((comment) => comment.pinned)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+}
+
+function isCorrectionComment(content: string) {
+  return content.trim().toLowerCase().startsWith('poprawka:')
+}
+
+function getLatestCorrection(task: GridTask) {
+  return [...task.comments]
+    .filter((comment) => isCorrectionComment(comment.content))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+}
+
+function CorrectionSignal({ task, compact = false }: { task: GridTask; compact?: boolean }) {
+  const correction = getLatestCorrection(task)
+  if (!correction) return null
+
+  return (
+    <span
+      className={`madi-comment-alert-pulse inline-flex shrink-0 items-center gap-1 rounded-full border border-red-400/80 bg-red-50 font-semibold text-red-700 shadow-sm dark:border-red-400/50 dark:bg-red-950/45 dark:text-red-200 ${
+        compact ? 'h-5 px-1.5 text-[10px]' : 'h-6 px-2 text-[11px]'
+      }`}
+      title={correction.content}
+    >
+      <AlertTriangle size={compact ? 10 : 12} />
+      {compact ? null : 'Poprawka'}
+    </span>
+  )
 }
 
 function PinnedCommentSignal({ task, compact = false }: { task: GridTask; compact?: boolean }) {
@@ -433,6 +461,7 @@ function TaskCard({ task, list, onDragStart, onDragOverTask, onDropOnTask, isDro
             <GripVertical size={13} className="shrink-0 text-muted-foreground opacity-60" />
             <TaskTypeIcon task={task} listName={list?.name} />
             <h3 className="truncate text-sm font-semibold text-foreground">{task.title}</h3>
+            <CorrectionSignal task={task} compact={compact} />
             <CommentBubbleSignal task={task} compact={compact} />
           </div>
           {!compact && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{task.description || 'Bez opisu'}</p>}
@@ -1191,6 +1220,7 @@ function EditableListView({ tasks, selectionMode }: { tasks: GridTask[]; selecti
               <div className="flex min-w-0 items-center gap-1.5">
                     <TaskTypeIcon task={task} listName={listName} size="sm" />
                     <p className="truncate font-medium text-foreground">{task.title || 'Bez nazwy'}</p>
+                    <CorrectionSignal task={task} compact />
                     <CommentBubbleSignal task={task} compact />
                     {pinnedComment && (
                       <span
@@ -2134,6 +2164,10 @@ function TaskDetailPanel() {
   const task = getActiveTask()
   const [newChecklist, setNewChecklist] = useState('')
   const [newComment, setNewComment] = useState('')
+  const [correctionReason, setCorrectionReason] = useState('Blad przygotowania plikow')
+  const [correctionDescription, setCorrectionDescription] = useState('')
+  const [correctionDueDate, setCorrectionDueDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [correctionEstimate, setCorrectionEstimate] = useState(30)
 
   if (!task) {
     return (
@@ -2151,6 +2185,7 @@ function TaskDetailPanel() {
   const authorName = user?.name ?? 'Emilia PluciĹ„ska'
   const timeMode = getTaskTimeMode(task)
   const pinnedComment = getPinnedComment(task)
+  const latestCorrection = getLatestCorrection(task)
 
   return (
     <aside className="w-[var(--app-detail-panel-width)] shrink-0 border-l border-border bg-background">
@@ -2418,6 +2453,77 @@ function TaskDetailPanel() {
 
           <DetailSection id="comments" title="Komentarze" icon={<MessageSquare size={14} />}>
             <div className="space-y-3">
+              <div className="rounded-md border border-red-300/80 bg-red-50 p-3 text-red-950 dark:border-red-400/45 dark:bg-red-950/35 dark:text-red-100">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <AlertTriangle size={15} />
+                    Poprawka / uwaga do zlecenia
+                  </div>
+                  {latestCorrection && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-900/60 dark:text-red-200">
+                      Aktywna
+                    </span>
+                  )}
+                </div>
+                {latestCorrection && (
+                  <p className="mb-3 rounded border border-red-200 bg-white/60 p-2 text-xs leading-relaxed dark:border-red-800 dark:bg-black/20">
+                    {latestCorrection.content}
+                  </p>
+                )}
+                <div className="grid gap-2">
+                  <select
+                    value={correctionReason}
+                    onChange={(event) => setCorrectionReason(event.target.value)}
+                    className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs outline-none focus:border-red-400 dark:border-red-800"
+                  >
+                    <option>Blad przygotowania plikow</option>
+                    <option>Blad obslugi zlecenia</option>
+                    <option>Blad produkcyjny / technologiczny</option>
+                    <option>Blad po stronie klienta</option>
+                    <option>Zmiana zakresu / dodatkowe uwagi</option>
+                  </select>
+                  <textarea
+                    value={correctionDescription}
+                    onChange={(event) => setCorrectionDescription(event.target.value)}
+                    placeholder="Opisz dokladnie co poprawic, co wyjasnic albo co blokuje dalszy etap..."
+                    rows={3}
+                    className="w-full resize-none rounded-md border border-red-200 bg-background p-2 text-xs outline-none focus:border-red-400 dark:border-red-800"
+                  />
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_96px]">
+                    <input
+                      type="date"
+                      value={correctionDueDate}
+                      onChange={(event) => setCorrectionDueDate(event.target.value)}
+                      className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs outline-none focus:border-red-400 dark:border-red-800"
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      value={correctionEstimate}
+                      onChange={(event) => setCorrectionEstimate(Number.parseInt(event.target.value, 10) || 0)}
+                      className="h-9 rounded-md border border-red-200 bg-background px-2 text-xs outline-none focus:border-red-400 dark:border-red-800"
+                      title="Szacowany czas poprawki w minutach"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const text = correctionDescription.trim()
+                      if (!text) return
+                      addComment(
+                        task.id,
+                        authorId,
+                        authorName,
+                        `Poprawka: ${correctionReason}. Termin: ${correctionDueDate}. Szacowany czas: ${correctionEstimate} min. ${text}`
+                      )
+                      setCorrectionDescription('')
+                    }}
+                    className="flex h-9 items-center justify-center gap-1.5 rounded-md bg-red-600 px-3 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    <AlertTriangle size={14} />
+                    Zglos poprawke
+                  </button>
+                </div>
+              </div>
               {task.comments.map((comment) => (
                 <div
                   key={comment.id}

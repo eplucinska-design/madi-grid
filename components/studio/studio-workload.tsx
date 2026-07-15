@@ -24,6 +24,7 @@ import {
 import { UserAvatar } from '@/components/common/assignee-avatar-stack'
 import { ModuleFrame, StatStrip } from '@/components/common/module-frame'
 import { MADI_GRID_GRAFIK_TASKS, type MadiGridGrafikTask } from '@/lib/data/madi-grid-export'
+import { useAuthStore } from '@/lib/store/auth-store'
 import { openOrderWindow } from '@/lib/utils/order-links'
 
 type StudioView = 'overview' | 'board' | 'list' | 'calendar'
@@ -130,6 +131,31 @@ const statusDot: Record<StudioStatus, string> = {
   accept: '#2f9e44',
   overdue: '#e03131',
   active: '#339af0',
+}
+
+function isStudioCorrection(text: string) {
+  return text.trim().toLowerCase().startsWith('poprawka:')
+}
+
+function latestStudioCorrection(task: StudioTask) {
+  return [...task.comments]
+    .filter((comment) => isStudioCorrection(comment.text))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+}
+
+function StudioCorrectionSignal({ task }: { task: StudioTask }) {
+  const correction = latestStudioCorrection(task)
+  if (!correction) return null
+
+  return (
+    <span
+      className="madi-comment-alert-pulse inline-flex shrink-0 items-center gap-1 rounded-full border border-red-400/80 bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:border-red-400/50 dark:bg-red-950/45 dark:text-red-200"
+      title={correction.text}
+    >
+      <AlertTriangle size={11} />
+      Poprawka
+    </span>
+  )
 }
 
 function formatMinutes(minutes: number) {
@@ -278,7 +304,10 @@ function ActiveGraphicTask({
             </span>
           </div>
 
-          <h2 className="text-balance text-xl font-semibold">{task.title}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-balance text-xl font-semibold">{task.title}</h2>
+            <StudioCorrectionSignal task={task} />
+          </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
               {task.queueLabel}
@@ -645,6 +674,7 @@ function StudioTaskCard({ task, selected, onSelect }: { task: StudioTask; select
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: statusDot[task.statusId] }} />
             <p className="line-clamp-2 text-sm font-semibold leading-snug">{task.title}</p>
+            <StudioCorrectionSignal task={task} />
           </div>
           <p className="mt-1 truncate text-[11px] text-muted-foreground">{task.client}</p>
         </div>
@@ -1210,8 +1240,14 @@ function GraphicCorrectionModal({
 }: {
   task: StudioTask
   onClose: () => void
-  onSave: () => void
+  onSave: (comment: { reason: string; description: string; date: string; time: string; minutes: number }) => void
 }) {
+  const [reason, setReason] = useState('Blad przygotowania plikow')
+  const [description, setDescription] = useState(task.note)
+  const [date, setDate] = useState('2026-07-14')
+  const [time, setTime] = useState('12:40')
+  const [minutes, setMinutes] = useState(60)
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
       <section className="w-full max-w-3xl rounded-md border border-border bg-popover p-5 text-popover-foreground shadow-2xl">
@@ -1225,12 +1261,16 @@ function GraphicCorrectionModal({
         <div className="grid gap-4">
           <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
             Powod poprawki
-            <select className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" defaultValue="">
-              <option value="" disabled>-- wybierz --</option>
+            <select
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary"
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+            >
               <option>Blad przygotowania plikow</option>
               <option>Blad obslugi zlecenia</option>
               <option>Blad produkcyjny / technologiczny</option>
               <option>Blad po stronie klienta</option>
+              <option>Zmiana zakresu / dodatkowe uwagi</option>
             </select>
           </label>
           <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
@@ -1238,21 +1278,22 @@ function GraphicCorrectionModal({
             <textarea
               className="min-h-24 resize-y rounded-md border border-border bg-background p-3 font-mono text-sm text-foreground outline-none focus:border-primary"
               placeholder="np. klient doslal uwagi: 1) zmienic tekst, 2) podmienic logo, 3) wyslac ponownie do akceptu"
-              defaultValue={task.note}
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
             />
           </label>
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
               Nowa data
-              <input type="date" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" defaultValue="2026-07-14" />
+              <input type="date" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" value={date} onChange={(event) => setDate(event.target.value)} />
             </label>
             <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
               Godzina
-              <input type="time" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" defaultValue="12:40" />
+              <input type="time" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" value={time} onChange={(event) => setTime(event.target.value)} />
             </label>
             <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
               Czas poprawki
-              <input type="number" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" defaultValue={60} />
+              <input type="number" className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary" value={minutes} onChange={(event) => setMinutes(Number.parseInt(event.target.value, 10) || 0)} />
             </label>
           </div>
         </div>
@@ -1261,7 +1302,13 @@ function GraphicCorrectionModal({
           <button onClick={onClose} className="rounded-md bg-muted px-3 py-2 text-sm font-semibold hover:bg-muted/80">
             Anuluj
           </button>
-          <button onClick={onSave} className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90">
+          <button
+            onClick={() => {
+              if (!description.trim()) return
+              onSave({ reason, description: description.trim(), date, time, minutes })
+            }}
+            className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+          >
             Zapisz poprawke
           </button>
         </footer>
@@ -1287,6 +1334,8 @@ export function StudioWorkload({
   const [running, setRunning] = useState(false)
   const [doneIds, setDoneIds] = useState<Set<string>>(() => new Set())
   const [correctionTask, setCorrectionTask] = useState<StudioTask | null>(null)
+  const [correctionsByTask, setCorrectionsByTask] = useState<Record<string, StudioTask['comments']>>({})
+  const { user } = useAuthStore()
 
   useEffect(() => {
     setView(initialView)
@@ -1294,12 +1343,17 @@ export function StudioWorkload({
 
   const filteredTasks = useMemo(() => {
     const normalized = query.trim().toLowerCase()
-    const availableTasks = allStudioTasks.filter((task) => !doneIds.has(task.id))
+    const availableTasks = allStudioTasks
+      .filter((task) => !doneIds.has(task.id))
+      .map((task) => ({
+        ...task,
+        comments: [...(correctionsByTask[task.id] ?? []), ...task.comments],
+      }))
     if (!normalized) return availableTasks
     return availableTasks.filter((task) =>
       [task.title, task.client, task.orderNumber, task.queueLabel, task.statusLabel].join(' ').toLowerCase().includes(normalized)
     )
-  }, [doneIds, query])
+  }, [correctionsByTask, doneIds, query])
 
   const selectedTask = filteredTasks.find((task) => task.id === selectedId) ?? newestWaitingTask(filteredTasks) ?? filteredTasks[0] ?? allStudioTasks[0]
   const plannedMinutes = filteredTasks.reduce((sum, task) => sum + task.minutes, 0)
@@ -1314,6 +1368,22 @@ export function StudioWorkload({
       return next
     })
     setRunning(false)
+  }
+  const saveGraphicCorrection = (
+    task: StudioTask,
+    input: { reason: string; description: string; date: string; time: string; minutes: number }
+  ) => {
+    const comment = {
+      id: `${task.id}-correction-${Date.now()}`,
+      author: user?.name ?? 'System',
+      text: `Poprawka: ${input.reason}. Termin: ${input.date} ${input.time}. Szacowany czas: ${input.minutes} min. ${input.description}`,
+      createdAt: new Date().toISOString(),
+    }
+    setCorrectionsByTask((current) => ({
+      ...current,
+      [task.id]: [comment, ...(current[task.id] ?? [])],
+    }))
+    setCorrectionTask(null)
   }
 
   return (
@@ -1387,7 +1457,7 @@ export function StudioWorkload({
         <GraphicCorrectionModal
           task={correctionTask}
           onClose={() => setCorrectionTask(null)}
-          onSave={() => setCorrectionTask(null)}
+          onSave={(input) => saveGraphicCorrection(correctionTask, input)}
         />
       )}
     </ModuleFrame>
