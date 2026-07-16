@@ -33,7 +33,7 @@ interface PinnedAnnouncement {
   createdAt: string
 }
 
-const STORAGE_KEY = 'madi-grid-pinned-announcements-v1'
+const STORAGE_KEY = 'madi-grid-pinned-announcements-v2-sanitized'
 
 const channelLabels: Record<NotificationChannel, string> = {
   orders: 'Zlecenia',

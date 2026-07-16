@@ -273,7 +273,7 @@ function makeDetailData(order: Order): DetailData {
     confirmDate: formatDateTime(order.updatedAt),
     deliveryMethod: deliveryAddress ? `${deliveryMethod} - ${deliveryAddress}` : deliveryMethod,
     deliveryHour,
-    filePath: `X:\\ZLECENIA\\${order.customerName}\\${order.orderNumber}\\${order.product}`,
+    filePath: `X:\\DEMO_ZLECENIA\\${order.customerName}\\${order.orderNumber}\\${order.product}`,
     rawMaterials: [
       { name: order.specifications || 'Material wg specyfikacji', amount: `${Math.max(1, Math.round(order.quantity / 320))} ark.` },
       { name: 'Karton / przekladki / etykiety logistyczne', amount: `${Math.max(1, Math.ceil(order.quantity / 1000))} kpl.` },

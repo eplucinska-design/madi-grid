@@ -229,7 +229,7 @@ const sampleQuotes: QuoteRecord[] = [
     id: 'quote-001',
     number: 'MAD/2026/07/0091',
     status: 'draft',
-    customer: 'ABC Marketing Sp. z o.o.',
+    customer: 'Demo Print Lab Sp. z o.o.',
     jobName: 'Pakiet startowy - ulotki i wizytowki',
     product: 'Wizytowki firmowe',
     productType: 'Wizytowki standardowe',
@@ -243,7 +243,7 @@ const sampleQuotes: QuoteRecord[] = [
     materialCost: 320,
     netPrice: 1206.46,
     margin: 55.4,
-    filesPath: 'Z:\\Klienci\\ABC Marketing\\Pakiet startowy',
+    filesPath: 'Z:\\DEMO\\Klienci\\Demo Print Lab\\Pakiet startowy',
     notes: 'Szablon wyceny z montazem uzytkow i podstawowymi procesami.',
     processIds: ['print-digital', 'cut-print', 'auto-crease', 'auto-fold', 'packing'],
     processOverrides: {},
@@ -255,7 +255,7 @@ const sampleQuotes: QuoteRecord[] = [
     id: 'quote-002',
     number: 'MAD/2026/07/0090',
     status: 'sent',
-    customer: 'TechPro Solutions',
+    customer: 'Fikcyjna Marka Reklamowa S.A.',
     jobName: 'Katalog 2026',
     product: 'Katalog A4 20 stron',
     productType: 'Katalog klejony',
@@ -269,7 +269,7 @@ const sampleQuotes: QuoteRecord[] = [
     materialCost: 180,
     netPrice: 468.3,
     margin: 38.2,
-    filesPath: 'Z:\\Klienci\\TechPro\\Katalog 2026',
+    filesPath: 'Z:\\DEMO\\Klienci\\Fikcyjna Marka\\Katalog 2026',
     notes: 'Wariant ekonomiczny bez folii.',
     processIds: ['print-digital', 'dtp', 'staple', 'packing'],
     processOverrides: {},
@@ -512,7 +512,7 @@ export const useQuotesStore = create<QuotesState>()(
       selectQuote: (quoteId) => set({ selectedQuoteId: quoteId }),
     }),
     {
-      name: 'madi-quotes-store-template-v1',
+      name: 'madi-quotes-store-template-v2-sanitized',
       merge: (persisted, current) => {
         const saved = persisted as Partial<QuotesState> | undefined
         const quotes = Array.isArray(saved?.quotes)

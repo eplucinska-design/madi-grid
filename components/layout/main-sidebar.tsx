@@ -36,7 +36,7 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   { id: 'start', label: 'Widok startowy', icon: <Home size={16} /> },
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} /> },
-  { id: 'customers', label: 'Klienci', icon: <Users size={16} />, badge: 1751 },
+  { id: 'customers', label: 'Klienci', icon: <Users size={16} />, badge: 12 },
   { id: 'orders', label: 'Zlecenia', icon: <FileText size={16} />, badge: 4 },
 ]
 

@@ -1457,7 +1457,7 @@ export function QuotesModule() {
                 <input
                   value={safeDraft.filesPath}
                   onChange={(event) => patchDraft({ filesPath: event.target.value })}
-                  placeholder="np. Z:\\Klienci\\COSMO\\Katalogi swiateczne"
+                  placeholder="np. Z:\\DEMO\\Klienci\\Demo Beauty\\Katalogi testowe"
                   className="h-9 w-full rounded-md border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-primary"
                 />
               </label>

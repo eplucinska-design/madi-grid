@@ -546,7 +546,7 @@ export function NewOrderModalHost() {
               </label>
               <label className="col-span-12">
                 <span className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase text-muted-foreground"><FolderOpen size={12} /> Sciezka plikow</span>
-                <input value={filesPath} onChange={(event) => setFilesPath(event.target.value)} className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary" placeholder="X:\\ZLECENIA\\Klient\\ZL-..." />
+                <input value={filesPath} onChange={(event) => setFilesPath(event.target.value)} className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary" placeholder="X:\\DEMO_ZLECENIA\\Klient\\ZL-..." />
               </label>
               <label className="col-span-12">
                 <span className="mb-1 block text-[11px] font-semibold uppercase text-muted-foreground">Uwagi / opis</span>

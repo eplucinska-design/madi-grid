@@ -175,7 +175,7 @@ function PathPanel({ task }: { task?: GridTask }) {
           <textarea
             value={pathDraft}
             onChange={(event) => setPathDraft(event.target.value)}
-            placeholder="np. X:\\!ZLECENIA\\Klient\\2026-07\\ZL-0140"
+            placeholder="np. X:\\!DEMO_ZLECENIA\\Klient\\2026-07\\ZL-0140"
             className="h-24 w-full resize-none rounded-md border border-border bg-background p-2 font-mono text-xs outline-none focus:border-primary"
           />
           <button

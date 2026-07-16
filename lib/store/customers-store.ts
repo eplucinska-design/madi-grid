@@ -5,15 +5,15 @@ import { MADI_GRID_CUSTOMERS } from '@/lib/data/madi-grid-customers'
 const sampleCustomers: Customer[] = [
   {
     id: 'c1',
-    companyName: 'ABC Marketing Sp. z o.o.',
+    companyName: 'Demo Print Lab Sp. z o.o.',
     taxId: '123-456-78-90',
     address: 'ul. Marketingowa 15',
     city: 'Warszawa',
     postalCode: '00-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct1', name: 'Anna Nowak', email: 'anna@abcmarketing.pl', phone: '+48 500 100 200', role: 'Dyrektor marketingu', isPrimary: true },
-      { id: 'ct2', name: 'Jan Kowalski', email: 'jan@abcmarketing.pl', phone: '+48 500 100 201', role: 'Project Manager', isPrimary: false },
+      { id: 'ct1', name: 'Anna Nowak', email: 'anna.testowa@example.com', phone: '+48 500 100 200', role: 'Dyrektor marketingu', isPrimary: true },
+      { id: 'ct2', name: 'Jan Kowalski', email: 'jan.testowy@example.com', phone: '+48 500 100 201', role: 'Project Manager', isPrimary: false },
     ],
     notes: 'Klient premium, preferuje kontakt mailowy',
     accountManager: '2',
@@ -24,14 +24,14 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c2',
-    companyName: 'TechPro Solutions',
+    companyName: 'Fikcyjna Marka Reklamowa S.A.',
     taxId: '987-654-32-10',
     address: 'ul. Technologiczna 42',
     city: 'Kraków',
     postalCode: '30-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct3', name: 'Michał Wiśniewski', email: 'michal@techpro.pl', phone: '+48 600 200 300', role: 'CEO', isPrimary: true },
+      { id: 'ct3', name: 'Michał Wiśniewski', email: 'michal.demo@example.com', phone: '+48 600 200 300', role: 'CEO', isPrimary: true },
     ],
     notes: 'Duże zamówienia, wymagający klient',
     accountManager: '2',
@@ -42,7 +42,7 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c3',
-    companyName: 'Kancelaria Prawna Nowak',
+    companyName: 'Studio Klienta Testowego Sp. z o.o.',
     taxId: '111-222-33-44',
     address: 'ul. Prawnicza 8',
     city: 'Poznań',
@@ -59,14 +59,14 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c4',
-    companyName: 'EventMax Group',
+    companyName: 'Mockup Events Polska Sp. z o.o.',
     taxId: '555-666-77-88',
     address: 'ul. Eventowa 25',
     city: 'Wrocław',
     postalCode: '50-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct5', name: 'Karolina Zielińska', email: 'karolina@eventmax.pl', phone: '+48 800 400 500', role: 'Event Manager', isPrimary: true },
+      { id: 'ct5', name: 'Karolina Zielińska', email: 'karolina.demo@example.com', phone: '+48 800 400 500', role: 'Event Manager', isPrimary: true },
     ],
     notes: 'Zamówienia sezonowe, głównie przed targami',
     accountManager: '2',
@@ -77,14 +77,14 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c5',
-    companyName: 'BioFood Polska',
+    companyName: 'Neutral Food Demo Sp. z o.o.',
     taxId: '444-333-22-11',
     address: 'ul. Ekologiczna 12',
     city: 'Gdańsk',
     postalCode: '80-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct6', name: 'Agata Kwiatkowska', email: 'agata@biofood.pl', phone: '+48 900 500 600', role: 'Marketing Manager', isPrimary: true },
+      { id: 'ct6', name: 'Agata Kwiatkowska', email: 'agata.demo@example.com', phone: '+48 900 500 600', role: 'Marketing Manager', isPrimary: true },
     ],
     notes: 'Preferuje materiały ekologiczne',
     accountManager: '2',
@@ -95,14 +95,14 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c6',
-    companyName: 'Filharmonia Miejska',
+    companyName: 'Kultura Demo Center',
     taxId: '777-888-99-00',
     address: 'ul. Muzyczna 1',
     city: 'Łódź',
     postalCode: '90-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct7', name: 'Barbara Melodia', email: 'barbara@filharmonia.pl', phone: '+48 100 600 700', role: 'Dyrektor ds. promocji', isPrimary: true },
+      { id: 'ct7', name: 'Barbara Melodia', email: 'barbara.demo@example.com', phone: '+48 100 600 700', role: 'Dyrektor ds. promocji', isPrimary: true },
     ],
     accountManager: '2',
     createdAt: new Date('2023-11-15'),
@@ -112,15 +112,15 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c7',
-    companyName: 'Bank Regionalny S.A.',
+    companyName: 'Finanse Testowe S.A.',
     taxId: '999-000-11-22',
     address: 'ul. Bankowa 100',
     city: 'Warszawa',
     postalCode: '00-100',
     country: 'Polska',
     contacts: [
-      { id: 'ct8', name: 'Robert Kapitalski', email: 'r.kapitalski@bankregionalny.pl', phone: '+48 200 700 800', role: 'Dyrektor marketingu', isPrimary: true },
-      { id: 'ct9', name: 'Ewa Kredytowa', email: 'e.kredytowa@bankregionalny.pl', phone: '+48 200 700 801', role: 'Specjalista ds. zamówień', isPrimary: false },
+      { id: 'ct8', name: 'Robert Kapitalski', email: 'robert.demo@example.com', phone: '+48 200 700 800', role: 'Dyrektor marketingu', isPrimary: true },
+      { id: 'ct9', name: 'Ewa Kredytowa', email: 'ewa.demo@example.com', phone: '+48 200 700 801', role: 'Specjalista ds. zamówień', isPrimary: false },
     ],
     notes: 'Klient korporacyjny, długie terminy płatności',
     accountManager: '2',
@@ -131,7 +131,7 @@ const sampleCustomers: Customer[] = [
   },
   {
     id: 'c8',
-    companyName: 'BuildPro Development',
+    companyName: 'Budowa Demo Development Sp. z o.o.',
     taxId: '222-333-44-55',
     address: 'ul. Budowlana 50',
     city: 'Katowice',
@@ -151,7 +151,7 @@ const sampleCustomers: Customer[] = [
 const importedCustomers: Customer[] = MADI_GRID_CUSTOMERS.map((customer) => {
   const hasContact = Boolean(customer.contactName || customer.email || customer.phone)
   const notes = [
-    `Import z Madi Grid - Klienci.pdf (${customer.group}).`,
+    `Import z danych demonstracyjnych (${customer.group}).`,
     customer.commonName ? `Nazwa zwyczajowa: ${customer.commonName}.` : '',
   ].filter(Boolean).join('\n')
 

@@ -318,7 +318,7 @@ const importedGrafikTasks: GridTask[] = MADI_GRID_GRAFIK_TASKS.map((task, index)
     estimateMinutes: workType === 'Projekt graficzny' ? 90 : 45,
     trackedMinutes: status === 'review' ? 15 : 0,
     tags: ['madi-grid-export', task.queueLabel, task.statusLabel].filter(Boolean),
-    filesPath: `X:\\!ZLECENIA\\${task.orderNumber.replaceAll('/', '\\')}`,
+    filesPath: `X:\\!DEMO_ZLECENIA\\${task.orderNumber.replaceAll('/', '\\')}`,
     position: 1000 + index * 10,
     createdAt: new Date(`${dueDate}T08:00:00`).toISOString(),
     updatedAt: new Date(`${dueDate}T12:00:00`).toISOString(),
@@ -351,7 +351,7 @@ const sampleTasks: GridTask[] = [
     status: 'in_progress',
     priority: 'urgent',
     assigneeIds: ['3', '6'],
-    customerName: 'TechPro Solutions',
+    customerName: 'Fikcyjna Marka Reklamowa S.A.',
     orderNumber: 'ZL-2026-0141',
     workType: 'Prepress',
     startDate: isoDate(0),
@@ -383,7 +383,7 @@ const sampleTasks: GridTask[] = [
     status: 'todo',
     priority: 'high',
     assigneeIds: ['3'],
-    customerName: 'ABC Marketing Sp. z o.o.',
+    customerName: 'Demo Print Lab Sp. z o.o.',
     orderNumber: 'ZL-2026-0142',
     workType: 'Projekt graficzny',
     startDate: isoDate(0),
@@ -412,7 +412,7 @@ const sampleTasks: GridTask[] = [
     status: 'blocked',
     priority: 'urgent',
     assigneeIds: ['2'],
-    customerName: 'EventMax Group',
+    customerName: 'Mockup Events Polska Sp. z o.o.',
     orderNumber: 'ZL-2026-0139',
     workType: 'Pliki',
     startDate: isoDate(-1),
@@ -443,7 +443,7 @@ const sampleTasks: GridTask[] = [
     status: 'production',
     priority: 'high',
     assigneeIds: ['6', '4'],
-    customerName: 'Bank Regionalny S.A.',
+    customerName: 'Finanse Testowe S.A.',
     orderNumber: 'ZL-2026-0136',
     workType: 'Introligatornia',
     startDate: isoDate(1),
@@ -1128,7 +1128,7 @@ export const useGridStore = create<GridState>()(
       getSelectedTasks: () => get().tasks.filter((task) => task.selected),
     }),
     {
-      name: 'madi-grid-workspace-template-v1',
+      name: 'madi-grid-workspace-template-v2-sanitized',
       merge: (persisted, current) => {
         const saved = persisted as Partial<GridState> | undefined
         const savedTasks = Array.isArray(saved?.tasks) ? saved.tasks : current.tasks

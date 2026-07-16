@@ -78,7 +78,7 @@ function normalizeTask(task: MadiGridGrafikTask, index: number): StudioTask {
     statusId,
     minutes: taskMinutes(task, index),
     trackedMinutes: statusId === 'active' ? 24 : statusId === 'accept' ? 15 : 0,
-    path: `X:\\!ZLECENIA\\${task.client.split(' ')[0] || 'Klient'}\\${task.deadline.slice(0, 10)} ${task.title}`,
+    path: `X:\\!DEMO_ZLECENIA\\${task.client.split(' ')[0] || 'Klient'}\\${task.deadline.slice(0, 10)} ${task.title}`,
     note: statusId === 'accept'
       ? 'Czeka na akcept klienta. Po akceptacji przekazac do kolejnego etapu.'
       : 'Sprawdzic komplet materialow, opis zlecenia i termin przed startem pracy.',
@@ -103,14 +103,14 @@ const priorityStudioTasks: StudioTask[] = [
     statusLabel: 'CZEKA',
     priorityLabel: 'Normalny',
     assignee: 'Przemek',
-    client: 'Sport Evolution Group Sp. z o.o.',
+    client: 'Demo Sport Group Sp. z o.o.',
     orderNumber: 'ZG/2026/07/0115',
     deadline: '2026-07-15 09:30',
     isOverdue: false,
     statusId: 'waiting',
     minutes: 60,
     trackedMinutes: 0,
-    path: 'X:\\!ZLECENIA\\Sport Evolution\\2026-07-14 koperty Ironman Krakow\\',
+    path: 'X:\\!DEMO_ZLECENIA\\Demo Sport Group\\2026-07-14 koperty testowe\\',
     note: 'Personalizacja kopert jak zawsze, pamietaj o odsunieciu grafiki od krawedzi tak jak ostatnio.',
     comments: [
       {

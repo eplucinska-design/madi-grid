@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useMemo, useState, type DragEvent, type MouseEvent as ReactMouseEvent } from 'react'
 import { createPortal } from 'react-dom'
@@ -833,11 +833,11 @@ function WorkspaceToolbar({
             Zaznacz widoczne
           </button>
           <button onClick={clearSelection} className="h-8 rounded border border-border px-2 text-xs hover:bg-muted">
-            WyczyĹ›Ä‡
+            Wyczyść
           </button>
           <button onClick={bulkDelete} className="ml-auto flex h-8 items-center gap-1 rounded border border-destructive/30 px-2 text-xs text-destructive hover:bg-destructive/10">
             <Trash2 size={13} />
-            UsuĹ„ zaznaczone
+            Usuń zaznaczone
           </button>
         </div>
       )}
@@ -1231,7 +1231,7 @@ function EditableListView({ tasks, selectionMode }: { tasks: GridTask[]; selecti
                     )}
                   </div>
                   <p className="truncate text-[11px] text-muted-foreground">
-                    {task.orderNumber || 'Bez numeru'} Â· {task.customerName || 'Bez klienta'}
+                    {task.orderNumber || 'Bez numeru'} · {task.customerName || 'Bez klienta'}
                   </p>
                   <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
                     <FolderOpen size={11} className="shrink-0" />
@@ -1333,7 +1333,7 @@ function CalendarView({ tasks }: { tasks: GridTask[] }) {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{task.title}</p>
                       <p className="truncate text-[11px] text-muted-foreground">
-                        {lists.find((list) => list.id === task.listId)?.name} Â· {task.customerName || 'Bez klienta'}
+                        {lists.find((list) => list.id === task.listId)?.name} · {task.customerName || 'Bez klienta'}
                       </p>
                     </div>
                     <PriorityPill priority={task.priority} />
@@ -1723,7 +1723,7 @@ function RcpSection({ task }: { task: GridTask }) {
   const [minutes, setMinutes] = useState('15')
   const events = [...(task.rcpEvents ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   const userId = user?.id ?? '1'
-  const userName = user?.name ?? 'Emilia PluciĹ„ska'
+  const userName = user?.name ?? 'Emilia Plucińska'
 
   const register = (type: GridRcpEventType) => {
     const minutesDelta = type === 'manual' || type === 'stop' || type === 'finish' ? toInputNumber(minutes) : 0
@@ -1829,7 +1829,7 @@ function ActivityRcpRow({ task, item }: { task: GridTask; item: GridTask['checkl
   const [code, setCode] = useState('')
   const [minutes, setMinutes] = useState(String(item.estimateMinutes || 15))
   const userId = user?.id ?? '1'
-  const userName = user?.name ?? 'Emilia PluciĹ„ska'
+  const userName = user?.name ?? 'Emilia Plucińska'
   const tracked = item.trackedMinutes ?? 0
   const estimate = item.estimateMinutes ?? 0
   const progress = estimate ? Math.min((tracked / estimate) * 100, 100) : item.done ? 100 : 0
@@ -2082,7 +2082,7 @@ function TaskFilesPanel({
           value={task.filesPath}
           onChange={(event) => onPathChange(event.target.value)}
           className="h-9 w-full rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground outline-none focus:border-primary"
-          placeholder="np. X:\\ZLECENIA\\Klient\\ZL-2026-0141"
+          placeholder="np. X:\\DEMO_ZLECENIA\\Klient\\ZL-2026-0141"
         />
       </label>
 
@@ -2185,7 +2185,7 @@ function TaskDetailPanel() {
   }
 
   const authorId = user?.id ?? '1'
-  const authorName = user?.name ?? 'Emilia PluciĹ„ska'
+  const authorName = user?.name ?? 'Emilia Plucińska'
   const timeMode = getTaskTimeMode(task)
   const pinnedComment = getPinnedComment(task)
   const latestCorrection = getLatestCorrection(task)
