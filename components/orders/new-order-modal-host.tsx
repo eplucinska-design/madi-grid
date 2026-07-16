@@ -569,7 +569,7 @@ export function NewOrderModalHost() {
                 </label>
                 <label>
                   <span className="mb-1 block text-[11px] font-semibold uppercase text-muted-foreground">Zlecajacy / handlowiec</span>
-                  <input value={requester} onChange={(event) => setRequester(event.target.value)} className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary" placeholder="np. Kacper Pilarski" />
+                  <input value={requester} onChange={(event) => setRequester(event.target.value)} className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-primary" placeholder="np. Handlowiec Demo" />
                 </label>
                 <label>
                   <span className="mb-1 block text-[11px] font-semibold uppercase text-muted-foreground">Format / wymiar</span>

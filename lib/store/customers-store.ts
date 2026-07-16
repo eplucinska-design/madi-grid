@@ -12,8 +12,8 @@ const sampleCustomers: Customer[] = [
     postalCode: '00-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct1', name: 'Anna Nowak', email: 'anna.testowa@example.com', phone: '+48 500 100 200', role: 'Dyrektor marketingu', isPrimary: true },
-      { id: 'ct2', name: 'Jan Kowalski', email: 'jan.testowy@example.com', phone: '+48 500 100 201', role: 'Project Manager', isPrimary: false },
+      { id: 'ct1', name: 'Kontakt Demo 1', email: 'kontakt1@example.com', phone: '+48 500 100 200', role: 'Dyrektor marketingu', isPrimary: true },
+      { id: 'ct2', name: 'Kontakt Demo 2', email: 'kontakt2@example.com', phone: '+48 500 100 201', role: 'Project Manager', isPrimary: false },
     ],
     notes: 'Klient premium, preferuje kontakt mailowy',
     accountManager: '2',
@@ -31,7 +31,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '30-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct3', name: 'Michał Wiśniewski', email: 'michal.demo@example.com', phone: '+48 600 200 300', role: 'CEO', isPrimary: true },
+      { id: 'ct3', name: 'Kontakt Demo 3', email: 'kontakt3@example.com', phone: '+48 600 200 300', role: 'CEO', isPrimary: true },
     ],
     notes: 'Duże zamówienia, wymagający klient',
     accountManager: '2',
@@ -49,7 +49,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '60-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct4', name: 'Mec. Piotr Nowak', email: 'p.nowak@kancelaria-nowak.pl', phone: '+48 700 300 400', role: 'Partner', isPrimary: true },
+      { id: 'ct4', name: 'Kontakt Demo 4', email: 'kontakt4@example.com', phone: '+48 700 300 400', role: 'Partner', isPrimary: true },
     ],
     accountManager: '2',
     createdAt: new Date('2024-03-10'),
@@ -66,7 +66,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '50-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct5', name: 'Karolina Zielińska', email: 'karolina.demo@example.com', phone: '+48 800 400 500', role: 'Event Manager', isPrimary: true },
+      { id: 'ct5', name: 'Kontakt Demo 5', email: 'kontakt5@example.com', phone: '+48 800 400 500', role: 'Event Manager', isPrimary: true },
     ],
     notes: 'Zamówienia sezonowe, głównie przed targami',
     accountManager: '2',
@@ -84,7 +84,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '80-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct6', name: 'Agata Kwiatkowska', email: 'agata.demo@example.com', phone: '+48 900 500 600', role: 'Marketing Manager', isPrimary: true },
+      { id: 'ct6', name: 'Kontakt Demo 6', email: 'kontakt6@example.com', phone: '+48 900 500 600', role: 'Marketing Manager', isPrimary: true },
     ],
     notes: 'Preferuje materiały ekologiczne',
     accountManager: '2',
@@ -102,7 +102,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '90-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct7', name: 'Barbara Melodia', email: 'barbara.demo@example.com', phone: '+48 100 600 700', role: 'Dyrektor ds. promocji', isPrimary: true },
+      { id: 'ct7', name: 'Kontakt Demo 7', email: 'kontakt7@example.com', phone: '+48 100 600 700', role: 'Dyrektor ds. promocji', isPrimary: true },
     ],
     accountManager: '2',
     createdAt: new Date('2023-11-15'),
@@ -119,8 +119,8 @@ const sampleCustomers: Customer[] = [
     postalCode: '00-100',
     country: 'Polska',
     contacts: [
-      { id: 'ct8', name: 'Robert Kapitalski', email: 'robert.demo@example.com', phone: '+48 200 700 800', role: 'Dyrektor marketingu', isPrimary: true },
-      { id: 'ct9', name: 'Ewa Kredytowa', email: 'ewa.demo@example.com', phone: '+48 200 700 801', role: 'Specjalista ds. zamówień', isPrimary: false },
+      { id: 'ct8', name: 'Kontakt Demo 8', email: 'kontakt8@example.com', phone: '+48 200 700 800', role: 'Dyrektor marketingu', isPrimary: true },
+      { id: 'ct9', name: 'Kontakt Demo 9', email: 'kontakt9@example.com', phone: '+48 200 700 801', role: 'Specjalista ds. zamówień', isPrimary: false },
     ],
     notes: 'Klient korporacyjny, długie terminy płatności',
     accountManager: '2',
@@ -138,7 +138,7 @@ const sampleCustomers: Customer[] = [
     postalCode: '40-001',
     country: 'Polska',
     contacts: [
-      { id: 'ct10', name: 'Tomasz Murarz', email: 'tomasz@buildpro.pl', phone: '+48 300 800 900', role: 'Marketing Manager', isPrimary: true },
+      { id: 'ct10', name: 'Kontakt Demo 10', email: 'kontakt10@example.com', phone: '+48 300 800 900', role: 'Marketing Manager', isPrimary: true },
     ],
     accountManager: '2',
     createdAt: new Date('2024-01-08'),

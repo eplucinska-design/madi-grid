@@ -1723,7 +1723,7 @@ function RcpSection({ task }: { task: GridTask }) {
   const [minutes, setMinutes] = useState('15')
   const events = [...(task.rcpEvents ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   const userId = user?.id ?? '1'
-  const userName = user?.name ?? 'Emilia Plucińska'
+  const userName = user?.name ?? 'Grafik Demo'
 
   const register = (type: GridRcpEventType) => {
     const minutesDelta = type === 'manual' || type === 'stop' || type === 'finish' ? toInputNumber(minutes) : 0
@@ -1829,7 +1829,7 @@ function ActivityRcpRow({ task, item }: { task: GridTask; item: GridTask['checkl
   const [code, setCode] = useState('')
   const [minutes, setMinutes] = useState(String(item.estimateMinutes || 15))
   const userId = user?.id ?? '1'
-  const userName = user?.name ?? 'Emilia Plucińska'
+  const userName = user?.name ?? 'Grafik Demo'
   const tracked = item.trackedMinutes ?? 0
   const estimate = item.estimateMinutes ?? 0
   const progress = estimate ? Math.min((tracked / estimate) * 100, 100) : item.done ? 100 : 0
@@ -2185,7 +2185,7 @@ function TaskDetailPanel() {
   }
 
   const authorId = user?.id ?? '1'
-  const authorName = user?.name ?? 'Emilia Plucińska'
+  const authorName = user?.name ?? 'Grafik Demo'
   const timeMode = getTaskTimeMode(task)
   const pinnedComment = getPinnedComment(task)
   const latestCorrection = getLatestCorrection(task)

@@ -309,7 +309,7 @@ export function LoginScreen() {
                         type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="np. emilia.plucinska"
+                        placeholder="np. grafik.demo"
                         className="w-full h-12 pl-12 pr-4 rounded-xl border border-white/[0.1] bg-white/[0.04] text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
                         required
                       />

@@ -344,7 +344,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'new_order',
     channel: 'updates',
-    actorName: 'Anna Kowalska',
+    actorName: 'Koordynator Demo 1',
     actorInitials: 'AK',
     actorColor: '#339af0',
     message: 'dodała nowe zlecenie z biura',
@@ -357,7 +357,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'assignment',
     channel: 'assignments',
-    actorName: 'Piotr Nowak',
+    actorName: 'Koordynator Demo 2',
     actorInitials: 'PN',
     actorColor: '#fab005',
     message: 'przypisał Ci zadanie DTP',
@@ -370,7 +370,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'deadline_change',
     channel: 'deadlines',
-    actorName: 'Anna Kowalska',
+    actorName: 'Koordynator Demo 1',
     actorInitials: 'AK',
     actorColor: '#339af0',
     message: 'zmieniła termin zlecenia na wcześniejszy',
@@ -382,7 +382,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'comment',
     channel: 'comments',
-    actorName: 'Maria Wiśniewska',
+    actorName: 'Grafik Demo 2',
     actorInitials: 'MW',
     actorColor: '#f06595',
     message: 'dodała komentarz do zadania',
@@ -407,7 +407,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'urgent',
     channel: 'alerts',
-    actorName: 'Piotr Nowak',
+    actorName: 'Koordynator Demo 2',
     actorInitials: 'PN',
     actorColor: '#fab005',
     message: 'oznaczył zadanie jako pilne',
@@ -431,7 +431,7 @@ const ACTIVITY_TEMPLATES: Omit<ActivityItem, 'id' | 'createdAt'>[] = [
   {
     kind: 'status_change',
     channel: 'updates',
-    actorName: 'Jan Kowalczyk',
+    actorName: 'Operator Demo 1',
     actorInitials: 'JK',
     actorColor: '#40c057',
     message: 'przesunął zlecenie do produkcji',

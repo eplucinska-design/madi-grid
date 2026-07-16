@@ -369,7 +369,7 @@ const sampleTasks: GridTask[] = [
       { id: 'chk-003', label: 'PDF do akceptacji', done: false },
     ],
     comments: [
-      { id: 'com-001', authorId: '8', authorName: 'Kacper Pilarski', content: 'Klient prosi o dodatkowy lakier na okladce.', createdAt: new Date(today.getTime() - 2 * 60 * 60 * 1000).toISOString() },
+      { id: 'com-001', authorId: '8', authorName: 'Handlowiec Demo', content: 'Klient prosi o dodatkowy lakier na okladce.', createdAt: new Date(today.getTime() - 2 * 60 * 60 * 1000).toISOString() },
     ],
     timeMode: 'task',
     selected: false,
@@ -429,7 +429,7 @@ const sampleTasks: GridTask[] = [
       { id: 'chk-007', label: 'Podmiana pliku', done: false },
     ],
     comments: [
-      { id: 'com-002', authorId: '2', authorName: 'Oliwier Matela', content: 'Bitmapa ma za niska rozdzielczosc, potrzebny wektor.', createdAt: new Date(today.getTime() - day).toISOString(), pinned: true },
+      { id: 'com-002', authorId: '2', authorName: 'Konstruktor Demo', content: 'Bitmapa ma za niska rozdzielczosc, potrzebny wektor.', createdAt: new Date(today.getTime() - day).toISOString(), pinned: true },
     ],
     timeMode: 'task',
     selected: false,

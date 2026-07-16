@@ -85,7 +85,7 @@ function normalizeTask(task: MadiGridGrafikTask, index: number): StudioTask {
     comments: [
       {
         id: `${task.id}-comment-1`,
-        author: task.assignee.replace('EEmilka', 'Emilia'),
+        author: task.assignee.replace('Grafik Demo', 'Grafik Demo'),
         text: statusId === 'overdue' ? 'Pozycja po terminie, wymaga decyzji co robimy dalej.' : 'Do sprawdzenia przed przekazaniem dalej.',
         createdAt: task.deadline,
       },
@@ -102,7 +102,7 @@ const priorityStudioTasks: StudioTask[] = [
     queueLabel: 'Grafik - przygotowanie plikow',
     statusLabel: 'CZEKA',
     priorityLabel: 'Normalny',
-    assignee: 'Przemek',
+    assignee: 'Zlecajacy Demo',
     client: 'Demo Sport Group Sp. z o.o.',
     orderNumber: 'ZG/2026/07/0115',
     deadline: '2026-07-15 09:30',
@@ -115,7 +115,7 @@ const priorityStudioTasks: StudioTask[] = [
     comments: [
       {
         id: 'studio-koperty-c4-comment-1',
-        author: 'Przemek',
+        author: 'Zlecajacy Demo',
         text: 'Najnowsze zlecenie w kolejce grafika. Mozna wystartowac od razu z karty Czeka.',
         createdAt: '2026-07-14 12:40',
       },
@@ -366,7 +366,7 @@ function ActiveGraphicTask({
             <InfoCell icon={<ExternalLink size={14} />} label="Zlecenie" value={task.orderNumber} mono />
             <InfoCell icon={<Clock3 size={14} />} label="Deadline" value={deadline(task)} />
             <InfoCell icon={<CalendarDays size={14} />} label="Klient" value={task.client} />
-            <InfoCell icon={<Timer size={14} />} label="Zlecajacy" value={task.assignee.replace('EEmilka', 'Emilia')} />
+            <InfoCell icon={<Timer size={14} />} label="Zlecajacy" value={task.assignee.replace('Grafik Demo', 'Grafik Demo')} />
             <InfoCell icon={<PanelRightOpen size={14} />} label="Pliki" value={task.path} mono className="sm:col-span-2" />
           </div>
 
@@ -501,7 +501,7 @@ function OverviewQueue({
               <span className="block truncate text-sm font-semibold">{task.title}</span>
               <span className="block truncate text-xs font-medium text-muted-foreground">{task.client}</span>
               <span className="mt-1 block text-[11px] font-semibold">
-                Zlecajacy: {task.assignee.replace('EEmilka', 'Emilia')}{' '}
+                Zlecajacy: {task.assignee.replace('Grafik Demo', 'Grafik Demo')}{' '}
                 <span className={task.statusId === 'overdue' ? 'text-red-600' : 'text-muted-foreground'}>
                   Deadline: {deadline(task)}
                 </span>
@@ -741,7 +741,7 @@ function StudioTaskCard({
           </div>
           <p className="mt-1 truncate text-[11px] text-muted-foreground">{task.client}</p>
         </div>
-        <UserAvatar label="Emilia Plucinska" color="#4c6ef5" size="sm" />
+        <UserAvatar label="Grafik Demo" color="#4c6ef5" size="sm" />
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         <span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${statusClasses[task.statusId]}`}>
@@ -1303,7 +1303,7 @@ function StudioAside({
           <dl className="grid gap-2 text-sm">
             {[
               ['Typ pracy', task.queueLabel === 'Zalegle' ? 'Grafik - przygotowanie plikow' : task.queueLabel],
-              ['Zlecajacy', task.assignee.replace('EEmilka', 'Emilia')],
+              ['Zlecajacy', task.assignee.replace('Grafik Demo', 'Grafik Demo')],
               ['Klient', task.client],
               ['Nr ZG', task.orderNumber],
               ['Priorytet', task.priorityLabel],
@@ -1469,8 +1469,8 @@ function StudioActivityAside({ tasks, selectedTask, onSelect, onOpen, onDone, on
     id: `${task.id}-activity`,
     task,
     kind: task.statusId === 'overdue' ? 'alerts' : task.comments.length ? 'comments' : index % 3 === 0 ? 'assignments' : 'updates',
-    actor: task.assignee.replace('EEmilka', 'Emilia'),
-    initials: task.assignee.replace('EEmilka', 'Emilia').slice(0, 2).toUpperCase(),
+    actor: task.assignee.replace('Grafik Demo', 'Grafik Demo'),
+    initials: task.assignee.replace('Grafik Demo', 'Grafik Demo').slice(0, 2).toUpperCase(),
     message: task.statusId === 'overdue'
       ? 'blokuje kolejke graficzna'
       : task.statusId === 'accept'
