@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process'
 const root = resolve(import.meta.dirname, '..')
 const outDir = join(root, 'out')
 const distDir = join(root, 'dist')
+const clientDir = join(distDir, 'client')
 const serverDir = join(distDir, 'server')
 const hostingFile = join(root, '.openai', 'hosting.json')
 
@@ -34,6 +35,8 @@ if (!existsSync(outDir)) {
 
 await mkdir(serverDir, { recursive: true })
 await cp(outDir, distDir, { recursive: true })
+await mkdir(clientDir, { recursive: true })
+await cp(outDir, clientDir, { recursive: true })
 await mkdir(join(distDir, '.openai'), { recursive: true })
 await cp(hostingFile, join(distDir, '.openai', 'hosting.json'))
 
