@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:sites": "node scripts/build_sites_package.mjs",
     "start": "next start",
     "export:github": "python scripts/export_github_package.py",
     "lint": "eslint ."

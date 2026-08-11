@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: process.env.SITES_STATIC_EXPORT === '1' ? 'export' : undefined,
   allowedDevOrigins: ['127.0.0.1', 'localhost', '192.168.8.123'],
   typescript: {
     ignoreBuildErrors: true,
